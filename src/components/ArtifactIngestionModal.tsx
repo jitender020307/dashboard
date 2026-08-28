@@ -12,10 +12,11 @@ import {
 import { EvidenceItem, ClassificationLevel, EvidenceType } from '../types';
 
 interface ArtifactIngestionModalProps {
-  isOpen: boolean;
+  isOpen?: boolean;
   onClose: () => void;
-  onIngestSuccess: (newEvidence: EvidenceItem) => void;
-  caseIdList: string[];
+  onIngestSuccess?: (newEvidence: EvidenceItem) => void;
+  onIngestionComplete?: (newEvidence: EvidenceItem) => void;
+  caseIdList?: string[];
 }
 
 const INGESTION_STEPS = [
@@ -31,16 +32,18 @@ const INGESTION_STEPS = [
 ];
 
 export const ArtifactIngestionModal: React.FC<ArtifactIngestionModalProps> = ({
-  isOpen,
+  isOpen = true,
   onClose,
   onIngestSuccess,
-  caseIdList,
+  onIngestionComplete,
+  caseIdList = ['CASE-UP-CYB-2026-00421', 'CASE-DL-CYB-2026-00389', 'CASE-MH-CYB-2026-00512'],
 }) => {
+  const handleSuccess = onIngestionComplete || onIngestSuccess || (() => {});
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [fileName, setFileName] = useState('FIR_Evidence_Capture_01.pdf');
   const [fileType, setFileType] = useState<EvidenceType>('DOC_PDF');
-  const [caseId, setCaseId] = useState(caseIdList[0] || '#INV-2026-00421');
-  const [classification, setClassification] = useState<ClassificationLevel>('TOP SECRET');
+  const [caseId, setCaseId] = useState(caseIdList[0] || 'CASE-UP-CYB-2026-00421');
+  const [classification, setClassification] = useState<ClassificationLevel>('HIGHLY_RESTRICTED');
   const [description, setDescription] = useState('Seized digital evidence artifact submitted for statutory court admissibility.');
   
   // Pipeline Execution State
@@ -141,7 +144,7 @@ export const ArtifactIngestionModal: React.FC<ArtifactIngestionModalProps> = ({
               writeBlockerUsed: 'Tableau T8u Hardware USB 3.0 Bridge'
             }
           };
-          onIngestSuccess(newEv);
+          handleSuccess(newEv);
         }
       }, delay);
     });

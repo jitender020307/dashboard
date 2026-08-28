@@ -17,17 +17,21 @@ import { EvidenceItem } from '../types';
 
 interface IntegrityEngineProps {
   evidenceItems: EvidenceItem[];
-  onVerifyEvidence: (id: string) => void;
-  onRestoreEvidence: (id: string) => void;
+  initialSelectedId?: string;
+  onVerifyEvidence?: (id: string) => void;
+  onVerifyHash?: (id: string) => void;
+  onRestoreEvidence?: (id: string) => void;
 }
 
 export const IntegrityEngineView: React.FC<IntegrityEngineProps> = ({
   evidenceItems,
+  initialSelectedId,
   onVerifyEvidence,
+  onVerifyHash,
   onRestoreEvidence,
 }) => {
   const [selectedEvidenceId, setSelectedEvidenceId] = useState<string>(
-    evidenceItems[0]?.id || 'EV-2026-00421'
+    initialSelectedId || evidenceItems[0]?.id || 'EV-2026-00421'
   );
   const [isVerifying, setIsVerifying] = useState(false);
   const [lastCheckTime, setLastCheckTime] = useState<string>(
@@ -52,7 +56,8 @@ export const IntegrityEngineView: React.FC<IntegrityEngineProps> = ({
       setIsVerifying(false);
       setLastCheckTime(new Date().toLocaleTimeString());
       if (selectedEvidence) {
-        onVerifyEvidence(selectedEvidence.id);
+        if (onVerifyHash) onVerifyHash(selectedEvidence.id);
+        else if (onVerifyEvidence) onVerifyEvidence(selectedEvidence.id);
       }
     }, 500);
   };

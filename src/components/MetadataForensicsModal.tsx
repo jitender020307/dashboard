@@ -11,16 +11,19 @@ import {
 import { EvidenceItem } from '../types';
 
 interface MetadataForensicsModalProps {
-  isOpen: boolean;
+  isOpen?: boolean;
   onClose: () => void;
-  evidence: EvidenceItem | null;
+  evidence?: EvidenceItem | null;
+  item?: EvidenceItem | null;
 }
 
 export const MetadataForensicsModal: React.FC<MetadataForensicsModalProps> = ({
-  isOpen,
+  isOpen = true,
   onClose,
-  evidence,
+  evidence: evidenceProp,
+  item,
 }) => {
+  const evidence = item || evidenceProp;
   if (!isOpen || !evidence) return null;
 
   const { metadata } = evidence;

@@ -6,10 +6,13 @@ import {
   Search,
   FolderKanban,
   X,
-  Terminal,
   ShieldAlert,
   CheckCircle2,
-  AlertTriangle
+  AlertTriangle,
+  Upload,
+  FileText,
+  Lock,
+  Stamp
 } from 'lucide-react';
 import {
   CaseItem,
@@ -21,9 +24,14 @@ import {
   SecurityThreat,
   AIForensicAnalysis,
   ActiveSession,
-  ForensicStats
+  ForensicStats,
+  ManagedDocument,
+  DocumentVersion,
+  SharedAccessRecord,
+  UserRole,
+  ClearanceLevel
 } from './types';
-import { INITIAL_CASES, INITIAL_ALERTS, CURRENT_OFFICER } from './data/mockData';
+import { INITIAL_CASES, INITIAL_ALERTS, CURRENT_OFFICER, INITIAL_MANAGED_DOCUMENTS } from './data/mockData';
 import {
   INITIAL_EVIDENCE_ITEMS,
   INITIAL_CUSTODY_EVENTS,
@@ -34,64 +42,70 @@ import {
   INITIAL_FORENSIC_STATS
 } from './data/forensicData';
 
+// Navigation & Modals
 import { Sidebar, AppTab } from './components/Sidebar';
 import { CaseCard } from './components/CaseCard';
 import { CaseDetailModal } from './components/CaseDetailModal';
 import { FilterModal, FilterOptions } from './components/FilterModal';
 import { NewCaseModal } from './components/NewCaseModal';
-import { DocumentsView } from './components/DocumentsView';
-import { AlertsView } from './components/AlertsView';
 import { UserProfileModal, LockScreen } from './components/UserProfileModal';
+import { UploadDocumentModal } from './components/UploadDocumentModal';
+import { SecureDocumentModal } from './components/SecureDocumentModal';
+import { GlobalSearchModal } from './components/GlobalSearchModal';
 
-// Forensic Module Views & Components
-import { CyberForensicsDashboard } from './components/CyberForensicsDashboard';
+// Core SIH 26190 Views
+import { OverviewDashboard } from './components/OverviewDashboard';
+import { DocumentRepositoryView } from './components/DocumentRepositoryView';
 import { DigitalEvidenceVaultView } from './components/DigitalEvidenceVaultView';
 import { IntegrityEngineView } from './components/IntegrityEngineView';
 import { ChainOfCustodyView } from './components/ChainOfCustodyView';
-import { ThreatMonitorView } from './components/ThreatMonitorView';
-import { NeuralForensicsView } from './components/NeuralForensicsView';
 import { SignatureVerificationView } from './components/SignatureVerificationView';
-import { SecurityTimelineView } from './components/SecurityTimelineView';
+import { SecureCollaborationView } from './components/SecureCollaborationView';
 import { AccessControlView } from './components/AccessControlView';
+import { SecurityTimelineView } from './components/SecurityTimelineView';
+import { DocumentIntelligenceView } from './components/DocumentIntelligenceView';
+import { LifecycleSettingsView } from './components/LifecycleSettingsView';
+import { SecurityEventsView } from './components/SecurityEventsView';
 import { ArtifactIngestionModal } from './components/ArtifactIngestionModal';
 import { MetadataForensicsModal } from './components/MetadataForensicsModal';
-import { HackerTerminal } from './components/HackerTerminal';
+import { SubSectionTabs } from './components/SubSectionTabs';
 
 export default function App() {
   // Navigation
   const [activeTab, setActiveTab] = useState<AppTab>('dashboard');
 
-  // Existing Data State
+  // Main Domain State
   const [cases, setCases] = useState<CaseItem[]>(INITIAL_CASES);
-  const [alerts, setAlerts] = useState<SecurityAlert[]>(INITIAL_ALERTS);
-  const [officer, setOfficer] = useState<OfficerProfile>(CURRENT_OFFICER);
-
-  // Forensics Data State
+  const [documents, setDocuments] = useState<ManagedDocument[]>(INITIAL_MANAGED_DOCUMENTS);
   const [evidenceItems, setEvidenceItems] = useState<EvidenceItem[]>(INITIAL_EVIDENCE_ITEMS);
   const [custodyEvents, setCustodyEvents] = useState<CustodyEvent[]>(INITIAL_CUSTODY_EVENTS);
   const [auditEvents, setAuditEvents] = useState<AuditEvent[]>(INITIAL_AUDIT_EVENTS);
   const [threats, setThreats] = useState<SecurityThreat[]>(INITIAL_THREATS);
+  const [alerts, setAlerts] = useState<SecurityAlert[]>(INITIAL_ALERTS);
   const [aiAnalyses, setAiAnalyses] = useState<Record<string, AIForensicAnalysis>>(INITIAL_AI_ANALYSES);
   const [activeSessions, setActiveSessions] = useState<ActiveSession[]>(INITIAL_ACTIVE_SESSIONS);
   const [stats, setStats] = useState<ForensicStats>(INITIAL_FORENSIC_STATS);
+  const [officer, setOfficer] = useState<OfficerProfile>(CURRENT_OFFICER);
 
   // Modals & Overlays
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [selectedCase, setSelectedCase] = useState<CaseItem | null>(null);
+  const [selectedDocument, setSelectedDocument] = useState<ManagedDocument | null>(null);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isNewCaseOpen, setIsNewCaseOpen] = useState(false);
+  const [isUploadDocOpen, setIsUploadDocOpen] = useState(false);
+  const [isIngestionOpen, setIsIngestionOpen] = useState(false);
+  const [isGlobalSearchOpen, setIsGlobalSearchOpen] = useState(false);
+  const [selectedMetadataItem, setSelectedMetadataItem] = useState<EvidenceItem | null>(null);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isLocked, setIsLocked] = useState(false);
 
-  // Forensic Specific Modals & State
-  const [isIngestionOpen, setIsIngestionOpen] = useState(false);
-  const [selectedMetadataItem, setSelectedMetadataItem] = useState<EvidenceItem | null>(null);
-  const [isTerminalOpen, setIsTerminalOpen] = useState(false);
+  // Sub-view selected IDs
   const [integritySelectedId, setIntegritySelectedId] = useState<string>('EV-2026-00421');
   const [custodySelectedId, setCustodySelectedId] = useState<string>('EV-2026-00421');
-  const [neuralSelectedId, setNeuralSelectedId] = useState<string>('EV-2026-00421');
+  const [intelligenceSelectedId, setIntelligenceSelectedId] = useState<string>('DOC-2026-00421-FIR');
 
-  // Temporary Toast Notification for RBAC & Demo Alerts
+  // Toast Notification
   const [toastMessage, setToastMessage] = useState<{
     type: 'SUCCESS' | 'ALERT' | 'DENIED';
     title: string;
@@ -105,38 +119,254 @@ export default function App() {
     }, 4500);
   };
 
-  // Keyboard shortcut for CLI Terminal (~ or F12)
+  // Keyboard shortcuts (Ctrl+K / Cmd+K for Global Search)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      const targetTag = (e.target as HTMLElement)?.tagName?.toUpperCase();
-      if (e.key === '`' && !e.shiftKey && targetTag !== 'INPUT' && targetTag !== 'TEXTAREA') {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
-        setIsTerminalOpen((prev) => !prev);
+        setIsGlobalSearchOpen((prev) => !prev);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // Update Stats when Evidence changes
+  // Update Stats when Evidence, Cases, or Docs Change
   useEffect(() => {
     const tamperedCount = evidenceItems.filter((e) => e.isTampered).length;
     const verifiedPercent =
       evidenceItems.length > 0
         ? Math.round(((evidenceItems.length - tamperedCount) / evidenceItems.length) * 100)
         : 100;
-    const activeThreatsCount = threats.filter((t) => t.status === 'ACTIVE').length;
+    const legalHolds = documents.filter((d) => d.legalHold).length;
+    let sharedCount = 0;
+    documents.forEach((d) => (sharedCount += d.sharedWith.length));
 
     setStats((prev) => ({
       ...prev,
+      totalCases: cases.length,
+      totalDocuments: documents.length,
       totalEvidenceItems: evidenceItems.length,
-      tamperAlertsCount: tamperedCount,
       integrityVerifiedPercent: verifiedPercent,
-      activeThreats: activeThreatsCount,
+      legalHoldCount: legalHolds,
+      sharedDocsCount: sharedCount,
+      totalAuditEvents: auditEvents.length,
+      activeSecurityEvents: threats.filter((t) => t.status === 'ACTIVE').length,
     }));
-  }, [evidenceItems, threats]);
+  }, [evidenceItems, documents, cases, threats, auditEvents]);
 
-  // Filters for Legal Cases Tab
+  // Log an Audit Event helper
+  const logAudit = (
+    action: string,
+    details: string,
+    result: 'SUCCESS' | 'DENIED' | 'ALERT' | 'FAILED' = 'SUCCESS',
+    severity: 'INFO' | 'WARNING' | 'CRITICAL' = 'INFO',
+    docId?: string,
+    caseId?: string
+  ) => {
+    const newAudit: AuditEvent = {
+      id: `AUD-${Math.floor(10000 + Math.random() * 90000)}`,
+      timestamp: new Date().toISOString().replace('T', ' ').slice(0, 19) + ' UTC',
+      user: officer.name,
+      userId: officer.id,
+      role: officer.roles[0] || 'INVESTIGATING_OFFICER',
+      action,
+      caseId: caseId || 'CASE-UP-CYB-2026-00421',
+      documentId: docId,
+      ip: '10.240.12.18',
+      device: 'Authorized Workstation',
+      result,
+      severity,
+      details,
+    };
+    setAuditEvents((prev) => [newAudit, ...prev]);
+  };
+
+  // Document Handlers
+  const handleUploadNewDocument = (newDoc: ManagedDocument) => {
+    setDocuments((prev) => [newDoc, ...prev]);
+    // Also update case documents count
+    setCases((prev) =>
+      prev.map((c) =>
+        c.id === newDoc.caseId ? { ...c, documentsCount: c.documentsCount + 1 } : c
+      )
+    );
+    logAudit(
+      'DOCUMENT_UPLOAD',
+      `Uploaded and registered new document "${newDoc.title}" (${newDoc.id}) with SHA-256 hash.`,
+      'SUCCESS',
+      'INFO',
+      newDoc.id,
+      newDoc.caseId
+    );
+    showToast('SUCCESS', 'Document Uploaded', `Document ${newDoc.id} has been ingested and verified.`);
+  };
+
+  const handleUploadNewVersion = (docId: string, versionData: Partial<DocumentVersion>) => {
+    setDocuments((prev) =>
+      prev.map((doc) => {
+        if (doc.id !== docId) return doc;
+        const updatedVersions = doc.versions.map((v) => ({ ...v, isCurrent: false }));
+        const newVer: DocumentVersion = {
+          versionNumber: versionData.versionNumber || doc.versions.length + 1,
+          versionTag: versionData.versionTag || `v${doc.versions.length + 1}.0`,
+          author: versionData.author || officer.name,
+          authorRole: versionData.authorRole || officer.roles[0],
+          timestamp: versionData.timestamp || new Date().toISOString().replace('T', ' ').slice(0, 19) + ' UTC',
+          changeDescription: versionData.changeDescription || 'Updated document edition.',
+          sha256Hash: versionData.sha256Hash || doc.sha256Hash,
+          fileSize: versionData.fileSize || doc.fileSize,
+          signatureStatus: versionData.signatureStatus || 'PENDING',
+          isCurrent: true,
+        };
+        return {
+          ...doc,
+          currentVersion: newVer.versionTag,
+          sha256Hash: newVer.sha256Hash,
+          lastModified: newVer.timestamp,
+          versions: [newVer, ...updatedVersions],
+        };
+      })
+    );
+
+    logAudit('VERSION_CREATED', `Committed new version for document ${docId}.`, 'SUCCESS', 'INFO', docId);
+    showToast('SUCCESS', 'Version Committed', `New version added to ${docId}.`);
+  };
+
+  const handleRestoreVersion = (docId: string, versionNumber: number) => {
+    setDocuments((prev) =>
+      prev.map((doc) => {
+        if (doc.id !== docId) return doc;
+        const targetVer = doc.versions.find((v) => v.versionNumber === versionNumber);
+        if (!targetVer) return doc;
+
+        const updatedVersions = doc.versions.map((v) => ({
+          ...v,
+          isCurrent: v.versionNumber === versionNumber,
+        }));
+
+        return {
+          ...doc,
+          currentVersion: targetVer.versionTag,
+          sha256Hash: targetVer.sha256Hash,
+          lastModified: new Date().toISOString().replace('T', ' ').slice(0, 19) + ' UTC',
+          versions: updatedVersions,
+        };
+      })
+    );
+
+    logAudit('VERSION_RESTORED', `Restored version ${versionNumber} for document ${docId}.`, 'SUCCESS', 'WARNING', docId);
+    showToast('SUCCESS', 'Version Restored', `Document ${docId} rolled back to v${versionNumber}.0.`);
+  };
+
+  const handleAddShare = (docId: string, shareData: Partial<SharedAccessRecord>) => {
+    setDocuments((prev) =>
+      prev.map((doc) => {
+        if (doc.id !== docId) return doc;
+        const newShare: SharedAccessRecord = {
+          id: shareData.id || `SHR-${Math.floor(1000 + Math.random() * 9000)}`,
+          documentId: doc.id,
+          documentTitle: doc.title,
+          sharedWithUserId: shareData.sharedWithUserId || 'LEGAL-08',
+          sharedWithUserName: shareData.sharedWithUserName || 'Adv. Sanjay Deshmukh',
+          sharedWithRole: shareData.sharedWithRole || 'LEGAL_OFFICER',
+          sharedByUserName: shareData.sharedByUserName || officer.name,
+          permission: shareData.permission || 'VIEW',
+          sharedAt: shareData.sharedAt || new Date().toISOString().replace('T', ' ').slice(0, 19) + ' UTC',
+          expiresAt: shareData.expiresAt || '7 Days',
+          status: 'ACTIVE',
+          notes: shareData.notes,
+        };
+        return {
+          ...doc,
+          sharedWith: [newShare, ...doc.sharedWith],
+        };
+      })
+    );
+
+    logAudit(
+      'DOCUMENT_SHARED',
+      `Shared document ${docId} with ${shareData.sharedWithUserName} (${shareData.sharedWithRole}). Permission: ${shareData.permission}`,
+      'SUCCESS',
+      'INFO',
+      docId
+    );
+    showToast('SUCCESS', 'Access Granted', `Granted ${shareData.permission} permissions to ${shareData.sharedWithUserName}.`);
+  };
+
+  const handleRevokeShare = (docId: string, shareId: string) => {
+    setDocuments((prev) =>
+      prev.map((doc) => {
+        if (doc.id !== docId) return doc;
+        return {
+          ...doc,
+          sharedWith: doc.sharedWith.filter((s) => s.id !== shareId),
+        };
+      })
+    );
+
+    logAudit('SHARE_REVOKED', `Revoked share token ${shareId} on document ${docId}.`, 'SUCCESS', 'WARNING', docId);
+    showToast('SUCCESS', 'Share Revoked', `Access revoked for share token ${shareId}.`);
+  };
+
+  const handleSignDocument = (docId: string) => {
+    setDocuments((prev) =>
+      prev.map((doc) => {
+        if (doc.id !== docId) return doc;
+        const nowIso = new Date().toISOString().replace('T', ' ').slice(0, 19) + ' UTC';
+        return {
+          ...doc,
+          digitalSignatureStatus: 'VALID',
+          signerName: `${officer.name} (${officer.rank})`,
+          signatureTimestamp: nowIso,
+          versions: doc.versions.map((v) =>
+            v.isCurrent ? { ...v, signatureStatus: 'VALID', signerName: `${officer.name} (${officer.rank})` } : v
+          ),
+        };
+      })
+    );
+
+    logAudit('DIGITAL_SIGNATURE_APPLIED', `Applied PKI digital signature to document ${docId}.`, 'SUCCESS', 'INFO', docId);
+    showToast('SUCCESS', 'Digital Signature Applied', `Officer signature stamped on document ${docId}.`);
+  };
+
+  const handleToggleLegalHold = (docId: string) => {
+    setDocuments((prev) =>
+      prev.map((doc) => {
+        if (doc.id !== docId) return doc;
+        const nextHold = !doc.legalHold;
+        logAudit(
+          'LEGAL_HOLD_TOGGLED',
+          `${nextHold ? 'Engaged' : 'Released'} legal preservation hold on ${docId}.`,
+          'SUCCESS',
+          nextHold ? 'WARNING' : 'INFO',
+          docId
+        );
+        return { ...doc, legalHold: nextHold };
+      })
+    );
+  };
+
+  const handleDownloadDoc = (doc: ManagedDocument) => {
+    // Check clearance
+    if (officer.clearanceLevel < doc.accessClearanceRequired) {
+      logAudit(
+        'ACCESS_DENIED',
+        `Officer clearance Level ${officer.clearanceLevel} insufficient for Level ${doc.accessClearanceRequired} document ${doc.id}.`,
+        'DENIED',
+        'CRITICAL',
+        doc.id,
+        doc.caseId
+      );
+      showToast('DENIED', 'Access Denied', `Clearance Level ${doc.accessClearanceRequired} required to download this record.`);
+      return;
+    }
+
+    logAudit('DOCUMENT_DOWNLOAD', `Downloaded document ${doc.title} (${doc.id}).`, 'SUCCESS', 'INFO', doc.id, doc.caseId);
+    showToast('SUCCESS', 'Download Initiated', `Secure stream generated for ${doc.title}.`);
+  };
+
+  // Case Filters for Cases View
   const [filters, setFilters] = useState<FilterOptions>({
     searchQuery: '',
     status: 'ALL',
@@ -155,736 +385,514 @@ export default function App() {
     });
   };
 
-  const filteredCases = cases.filter((c) => {
-    if (filters.searchQuery.trim()) {
-      const q = filters.searchQuery.toLowerCase();
-      const matchId = c.id.toLowerCase().includes(q);
-      const matchTitle = c.title.toLowerCase().includes(q);
-      const matchSummary = c.summary.toLowerCase().includes(q);
-      const matchSuspect = c.suspects.some(
-        (s) =>
-          s.name.toLowerCase().includes(q) || s.alias.toLowerCase().includes(q)
-      );
-      const matchTag = c.tags.some((t) => t.toLowerCase().includes(q));
-      if (!matchId && !matchTitle && !matchSummary && !matchSuspect && !matchTag) {
-        return false;
-      }
-    }
+  const filteredCases = cases.filter((caseItem) => {
+    const matchesSearch =
+      caseItem.title.toLowerCase().includes(filters.searchQuery.toLowerCase()) ||
+      caseItem.id.toLowerCase().includes(filters.searchQuery.toLowerCase()) ||
+      caseItem.summary.toLowerCase().includes(filters.searchQuery.toLowerCase());
 
-    if (filters.status !== 'ALL' && c.status !== filters.status) return false;
-    if (filters.classification !== 'ALL' && c.classification !== filters.classification) return false;
-    if (filters.leadOfficer !== 'ALL' && c.leadOfficer.id !== filters.leadOfficer) return false;
+    const matchesStatus =
+      filters.status === 'ALL' || caseItem.status === filters.status;
 
-    return true;
+    const matchesClassification =
+      filters.classification === 'ALL' ||
+      caseItem.classification === filters.classification;
+
+    const matchesOfficer =
+      filters.leadOfficer === 'ALL' ||
+      caseItem.leadOfficer.name === filters.leadOfficer;
+
+    const matchesEvidence =
+      caseItem.evidenceCount >= filters.minEvidence;
+
+    return (
+      matchesSearch &&
+      matchesStatus &&
+      matchesClassification &&
+      matchesOfficer &&
+      matchesEvidence
+    );
   });
 
-  // --- FORENSIC HANDLERS ---
-
-  // 1. Verify Evidence Hash
-  const handleVerifyEvidence = (id: string) => {
-    setEvidenceItems((prev) =>
-      prev.map((item) => {
-        if (item.id === id) {
-          const isMatched = item.digitalHashSha256 === item.currentHashSha256;
-          return {
-            ...item,
-            digitalHashVerified: isMatched,
-            isTampered: !isMatched,
-          };
-        }
-        return item;
-      })
-    );
-
-    const target = evidenceItems.find((e) => e.id === id);
-    const now = new Date().toISOString().replace('T', ' ').slice(0, 19) + ' UTC';
-
-    if (target?.isTampered || (target && target.digitalHashSha256 !== target.currentHashSha256)) {
-      const newAudit: AuditEvent = {
-        id: `AUD-${Date.now().toString().slice(-4)}`,
-        timestamp: now,
-        user: officer.name,
-        role: officer.roles[0],
-        action: 'HASH_MISMATCH',
-        severity: 'CRITICAL',
-        result: 'ALERT',
-        caseId: target.caseId,
-        evidenceId: target.id,
-        ip: '10.240.12.18',
-        device: 'SCIF Ingestion Node 78B',
-        details: `Integrity check FAILED for ${target.name}. Authoritative Hash mismatch with bitstream.`
-      };
-      setAuditEvents((prev) => [newAudit, ...prev]);
-      showToast('ALERT', 'CRITICAL INTEGRITY FAILURE', `SHA-256 Hash Mismatch detected in ${target.name}`);
-    } else {
-      const newAudit: AuditEvent = {
-        id: `AUD-${Date.now().toString().slice(-4)}`,
-        timestamp: now,
-        user: officer.name,
-        role: officer.roles[0],
-        action: 'HASH_VERIFIED',
-        severity: 'INFO',
-        result: 'SUCCESS',
-        caseId: target?.caseId,
-        evidenceId: target?.id,
-        ip: '10.240.12.18',
-        device: 'SCIF Ingestion Node 78B',
-        details: `SHA-256 Bitstream integrity verified (100% Match) for ${target?.name}.`
-      };
-      setAuditEvents((prev) => [newAudit, ...prev]);
-      showToast('SUCCESS', 'INTEGRITY VERIFIED', `100% SHA-256 Bitstream match confirmed for ${target?.name}`);
-    }
-  };
-
-  // 2. Restore Evidence
-  const handleRestoreEvidence = (id: string) => {
-    setEvidenceItems((prev) =>
-      prev.map((item) => {
-        if (item.id === id) {
-          return {
-            ...item,
-            currentHashSha256: item.digitalHashSha256,
-            isTampered: false,
-            digitalHashVerified: true,
-          };
-        }
-        return item;
-      })
-    );
-
-    const target = evidenceItems.find((e) => e.id === id);
-    const now = new Date().toISOString().replace('T', ' ').slice(0, 19) + ' UTC';
-
-    const newAudit: AuditEvent = {
-      id: `AUD-${Date.now().toString().slice(-4)}`,
-      timestamp: now,
-      user: officer.name,
-      role: officer.roles[0],
-      action: 'HASH_VERIFIED',
-      severity: 'INFO',
-      result: 'SUCCESS',
-      caseId: target?.caseId,
-      evidenceId: target?.id,
-      ip: '10.240.12.18',
-      device: 'SCIF Ingestion Node 78B',
-      details: `Original bitstream restored from Genesis ZFS write-blocked snapshot for ${target?.name}.`
-    };
-    setAuditEvents((prev) => [newAudit, ...prev]);
-    showToast('SUCCESS', 'INTEGRITY RESTORED', `Authoritative Genesis bitstream restored for ${target?.name}`);
-  };
-
-  // 4. Ingestion Pipeline Complete
-  const handleIngestSuccess = (newEvidence: EvidenceItem) => {
-    setEvidenceItems((prev) => [newEvidence, ...prev]);
-    const now = new Date().toISOString().replace('T', ' ').slice(0, 19) + ' UTC';
-
-    // Log Audit Event
-    const newAudit: AuditEvent = {
-      id: `AUD-${Date.now().toString().slice(-4)}`,
-      timestamp: now,
-      user: officer.name,
-      role: officer.roles[0],
-      action: 'UPLOAD',
-      severity: 'INFO',
-      result: 'SUCCESS',
-      caseId: newEvidence.caseId,
-      evidenceId: newEvidence.id,
-      ip: '10.240.12.18',
-      device: 'Tableau T8u Hardware Write-Blocker',
-      details: `New digital evidence artifact ingested: ${newEvidence.name} (SHA-256 calculated, AES-256 encrypted).`
-    };
-    setAuditEvents((prev) => [newAudit, ...prev]);
-
-    // Create Initial Custody Event
-    const genesisCustody: CustodyEvent = {
-      id: `COC-${Math.floor(1000 + Math.random() * 9000)}`,
-      evidenceId: newEvidence.id,
-      caseId: newEvidence.caseId,
-      timestamp: now,
-      actorId: officer.id,
-      actorName: `${officer.name} (${officer.rank})`,
-      actorRole: officer.roles[0],
-      action: 'INGESTED',
-      location: 'Cyber Forensic Ingestion Port 4',
-      deviceIp: '10.240.12.18',
-      cryptographicSignature: `04:AF:89:12:${Array.from({ length: 8 }, () => Math.floor(Math.random() * 256).toString(16).padStart(2, '0')).join(':').toUpperCase()}`,
-      hash: newEvidence.digitalHashSha256,
-      remarks: 'Genesis artifact ingestion via hardware write-blocker under Sec 65B Indian Evidence Act.',
-      verified: true,
-    };
-    setCustodyEvents((prev) => [genesisCustody, ...prev]);
-
-    showToast('SUCCESS', 'ARTIFACT INGESTED & SECURED', `${newEvidence.name} added to Immutable Vault with SHA-256 hash.`);
-  };
-
-  // 5. Add Custody Transfer Event
-  const handleAddCustodyEvent = (event: CustodyEvent) => {
-    setCustodyEvents((prev) => [event, ...prev]);
-    const newAudit: AuditEvent = {
-      id: `AUD-${Date.now().toString().slice(-4)}`,
-      timestamp: event.timestamp,
-      user: event.actorName,
-      role: event.actorRole,
-      action: 'EVIDENCE_TRANSFERRED',
-      severity: 'INFO',
-      result: 'SUCCESS',
-      caseId: event.caseId,
-      evidenceId: event.evidenceId,
-      ip: event.deviceIp,
-      device: 'SCIF Enclave Node',
-      details: `Custody transferred for ${event.evidenceId}: ${event.remarks}`
-    };
-    setAuditEvents((prev) => [newAudit, ...prev]);
-    showToast('SUCCESS', 'CUSTODY EVENT LOGGED', `Transfer block cryptographically signed and committed.`);
-  };
-
-  // 6. Threat Mitigation
-  const handleMitigateThreat = (id: string, action: string) => {
-    setThreats((prev) =>
-      prev.map((t) =>
-        t.id === id
-          ? {
-              ...t,
-              status: (action as any),
-              actionTaken: `Mitigated by ${officer.name} via autonomous IP quarantine rule.`,
-            }
-          : t
-      )
-    );
-    showToast('SUCCESS', 'THREAT MITIGATED', `Quarantine rule applied to threat vector ${id}`);
-  };
-
-  // 7. Sign Evidence
-  const handleSignEvidence = (id: string, signerName: string) => {
-    setEvidenceItems((prev) =>
-      prev.map((e) =>
-        e.id === id
-          ? {
-              ...e,
-              signatureStatus: 'VALID',
-              signerName: signerName,
-            }
-          : e
-      )
-    );
-    const now = new Date().toISOString().replace('T', ' ').slice(0, 19) + ' UTC';
-    const newAudit: AuditEvent = {
-      id: `AUD-${Date.now().toString().slice(-4)}`,
-      timestamp: now,
-      user: signerName,
-      role: officer.roles[0],
-      action: 'SIGNATURE_VERIFIED',
-      severity: 'INFO',
-      result: 'SUCCESS',
-      evidenceId: id,
-      ip: '10.240.12.18',
-      device: 'FIPS 140-3 Cryptographic HSM Token',
-      details: `Asymmetric ECDSA P-384 digital signature affixed to artifact ${id}.`
-    };
-    setAuditEvents((prev) => [newAudit, ...prev]);
-    showToast('SUCCESS', 'DIGITALLY SIGNED', `ECDSA signature stamped by ${signerName}`);
-  };
-
-  // 8. Revoke Active Session
-  const handleRevokeSession = (sessionId: string) => {
-    setActiveSessions((prev) => prev.filter((s) => s.id !== sessionId));
-    const now = new Date().toISOString().replace('T', ' ').slice(0, 19) + ' UTC';
-    const newAudit: AuditEvent = {
-      id: `AUD-${Date.now().toString().slice(-4)}`,
-      timestamp: now,
-      user: officer.name,
-      role: officer.roles[0],
-      action: 'LOGOUT',
-      severity: 'WARNING',
-      result: 'SUCCESS',
-      ip: '10.240.12.18',
-      device: 'SCIF Gateway',
-      details: `Session ${sessionId} forcefully terminated via Zero Trust access policy.`
-    };
-    setAuditEvents((prev) => [newAudit, ...prev]);
-    showToast('SUCCESS', 'SESSION REVOKED', `Enclave bearer token revoked for session ${sessionId}`);
-  };
-
-  // 9. Download Evidence (RBAC Enforcement)
-  const handleDownloadEvidence = (evidence: EvidenceItem) => {
-    if (evidence.classification === 'TOP SECRET' && officer.clearanceLevel < 4) {
-      const now = new Date().toISOString().replace('T', ' ').slice(0, 19) + ' UTC';
-      const newAudit: AuditEvent = {
-        id: `AUD-${Date.now().toString().slice(-4)}`,
-        timestamp: now,
-        user: officer.name,
-        role: officer.roles[0],
-        action: 'ACCESS_DENIED',
-        severity: 'WARNING',
-        result: 'DENIED',
-        caseId: evidence.caseId,
-        evidenceId: evidence.id,
-        ip: '10.240.12.18',
-        device: 'SCIF Ingestion Node',
-        details: `Download blocked: User clearance (${officer.clearanceName}) insufficient for TOP SECRET artifact ${evidence.id}.`
-      };
-      setAuditEvents((prev) => [newAudit, ...prev]);
-      showToast('DENIED', 'ACCESS DENIED (ZERO TRUST)', `Insufficient clearance level for TOP SECRET artifact ${evidence.id}.`);
-    } else {
-      const now = new Date().toISOString().replace('T', ' ').slice(0, 19) + ' UTC';
-      const newAudit: AuditEvent = {
-        id: `AUD-${Date.now().toString().slice(-4)}`,
-        timestamp: now,
-        user: officer.name,
-        role: officer.roles[0],
-        action: 'DOWNLOAD',
-        severity: 'INFO',
-        result: 'SUCCESS',
-        caseId: evidence.caseId,
-        evidenceId: evidence.id,
-        ip: '10.240.12.18',
-        device: 'SCIF Ingestion Node',
-        details: `Decrypted copy of ${evidence.name} downloaded under custodial clearance.`
-      };
-      setAuditEvents((prev) => [newAudit, ...prev]);
-      showToast('SUCCESS', 'DOWNLOAD AUTHORIZED', `Decrypted copy prepared with forensic watermarking for ${evidence.name}.`);
-    }
-  };
-
-  // Case CRUD
-  const handleSaveNewCase = (newCase: CaseItem) => {
-    setCases([newCase, ...cases]);
-    showToast('SUCCESS', 'CASE DOCKET CREATED', `Investigation case #${newCase.id} successfully opened.`);
-  };
-
-  const handleUpdateCase = (updated: CaseItem) => {
-    setCases(cases.map((c) => (c.id === updated.id ? updated : c)));
-    setSelectedCase(updated);
-  };
-
-  const handleAcknowledgeAlert = (alertId: string) => {
-    setAlerts(
-      alerts.map((a) =>
-        a.id === alertId ? { ...a, acknowledged: true } : a
-      )
-    );
-  };
-
-  const unreadAlertsCount = alerts.filter((a) => !a.acknowledged).length;
-  const totalDocsCount = cases.reduce((acc, c) => acc + c.documentsCount, 0);
-
-  const hasActiveFilters =
-    filters.searchQuery !== '' ||
-    filters.status !== 'ALL' ||
-    filters.classification !== 'ALL' ||
-    filters.leadOfficer !== 'ALL';
-
+  // Lockscreen Handler
   if (isLocked) {
-    return <LockScreen onUnlock={() => setIsLocked(false)} officer={officer} />;
+    return <LockScreen officer={officer} onUnlock={() => setIsLocked(false)} />;
   }
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] text-slate-900 font-sans selection:bg-slate-200 selection:text-slate-900">
-      {/* Left-Corner Minimal Sidebar with Forensics & Case Navigation */}
-      <Sidebar
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        unreadAlertsCount={unreadAlertsCount}
-        totalCasesCount={cases.length}
-        totalDocsCount={totalDocsCount}
-        evidenceVaultCount={evidenceItems.length}
-        tamperAlertsCount={stats.tamperAlertsCount}
-        activeThreatsCount={stats.activeThreats}
-        officer={officer}
-        onOpenProfile={() => setIsProfileOpen(true)}
-        onLockSystem={() => setIsLocked(true)}
-        onToggleTerminal={() => setIsTerminalOpen(!isTerminalOpen)}
-        isMobileOpen={isMobileSidebarOpen}
-        onCloseMobile={() => setIsMobileSidebarOpen(false)}
-      />
-
-      {/* Main Workspace (Offset by left sidebar on desktop) */}
-      <div className="md:pl-[275px] flex flex-col min-h-screen">
-        {/* Top Minimal Bar with SOC Telemetry Status */}
-        <header className="sticky top-0 z-30 h-14 bg-white/90 backdrop-blur-md border-b border-slate-200 px-4 sm:px-6 flex items-center justify-between font-technical">
+    <div className="min-h-screen bg-slate-100 text-slate-900 flex flex-col font-sans">
+      {/* Top Application Header */}
+      <header className="sticky top-0 z-30 bg-white border-b border-slate-200 shadow-2xs">
+        <div className="flex items-center justify-between px-4 py-2.5 max-w-7xl mx-auto w-full">
+          {/* Left: Mobile Menu Toggle & Title */}
           <div className="flex items-center gap-3">
             <button
               onClick={() => setIsMobileSidebarOpen(true)}
-              className="p-1.5 rounded-md text-slate-600 hover:text-slate-900 hover:bg-slate-100 md:hidden transition-colors cursor-pointer"
+              className="p-2 rounded-lg text-slate-600 hover:bg-slate-100 lg:hidden cursor-pointer"
+              title="Open Navigation"
             >
               <Menu className="w-5 h-5" />
             </button>
 
             <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-500" />
-              <span className="font-bold text-xs text-slate-900 tracking-wider">
-                SECURE-DMS // FORENSICS COMMAND CENTER
+              <span className="font-bold text-slate-900 text-sm sm:text-base tracking-tight">
+                SECURE-DMS
               </span>
-              <span className="hidden sm:inline-block px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-slate-600 text-[10px] font-mono">
-                SCIF ENCLAVE
+              <span className="hidden sm:inline-block text-[11px] px-2 py-0.5 rounded-full bg-slate-100 border border-slate-200 text-slate-600 font-medium">
+                SIH 26190
               </span>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 sm:gap-3">
-            {/* CLI Terminal Toggle */}
+          {/* Center: Global Search Bar Trigger (Ctrl+K) */}
+          <button
+            onClick={() => setIsGlobalSearchOpen(true)}
+            className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-50 border border-slate-200 hover:border-slate-400 text-slate-500 text-xs w-72 justify-between cursor-pointer transition-colors shadow-2xs"
+          >
+            <div className="flex items-center gap-2">
+              <Search className="w-3.5 h-3.5" />
+              <span>Search cases, documents...</span>
+            </div>
+            <kbd className="px-1.5 py-0.5 rounded bg-slate-200 text-[10px] font-mono text-slate-700">
+              Ctrl+K
+            </kbd>
+          </button>
+
+          {/* Right: Quick Ingestion + Officer Badge */}
+          <div className="flex items-center gap-2.5">
             <button
-              onClick={() => setIsTerminalOpen(!isTerminalOpen)}
-              className="px-2.5 py-1 rounded-md bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs font-mono font-medium flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
+              onClick={() => setIsUploadDocOpen(true)}
+              className="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs rounded-lg transition-colors flex items-center gap-1.5 shadow-xs cursor-pointer"
             >
-              <Terminal className="w-3.5 h-3.5 text-slate-500" />
-              <span className="hidden sm:inline">CLI [~]</span>
+              <Upload className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Upload Doc</span>
             </button>
 
-            {/* Officer Clearance Pill */}
+            <button
+              onClick={() => setIsGlobalSearchOpen(true)}
+              className="p-2 text-slate-500 hover:text-slate-900 md:hidden cursor-pointer"
+            >
+              <Search className="w-4 h-4" />
+            </button>
+
             <button
               onClick={() => setIsProfileOpen(true)}
-              className="flex items-center gap-2 p-1 pl-2.5 rounded-lg bg-white border border-slate-200 text-xs text-slate-700 hover:border-slate-300 transition-colors cursor-pointer shadow-2xs"
+              className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer transition-colors"
             >
-              <span className="font-mono text-[11px] text-slate-700 font-semibold hidden sm:inline">
-                {officer.name.split(' ')[0]} ({officer.id})
+              <div className="w-2 h-2 rounded-full bg-emerald-500" />
+              <span className="text-xs font-semibold text-slate-800 hidden sm:inline">
+                {officer.name.split(' ')[1] || officer.name}
               </span>
-              <div className="w-7 h-7 rounded-md bg-slate-900 text-white font-bold text-xs flex items-center justify-center font-mono">
-                {officer.id.slice(-2)}
-              </div>
+              <span className="text-[10px] font-mono bg-slate-100 px-1 rounded text-slate-600">
+                L{officer.clearanceLevel}
+              </span>
             </button>
           </div>
-        </header>
+        </div>
+      </header>
 
-        {/* Global Toast Alert Notification */}
-        {toastMessage && (
-          <div className="fixed top-16 right-4 z-50 max-w-md w-full">
-            <div className={`p-4 rounded-xl border shadow-lg flex items-start gap-3 bg-white ${
-              toastMessage.type === 'ALERT'
-                ? 'border-rose-300 text-rose-900 shadow-rose-100'
-                : toastMessage.type === 'DENIED'
-                ? 'border-amber-300 text-amber-900 shadow-amber-100'
-                : 'border-emerald-300 text-emerald-900 shadow-emerald-100'
-            }`}>
-              {toastMessage.type === 'ALERT' ? (
-                <ShieldAlert className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
-              ) : toastMessage.type === 'DENIED' ? (
-                <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
-              ) : (
-                <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
-              )}
-              <div className="flex-1 text-xs">
-                <div className="font-bold uppercase tracking-wider font-technical">
-                  {toastMessage.title}
-                </div>
-                <div className="text-[11px] text-slate-600 mt-0.5 font-sans">
-                  {toastMessage.description}
-                </div>
-              </div>
-              <button
-                onClick={() => setToastMessage(null)}
-                className="text-slate-400 hover:text-slate-700 p-1"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-        )}
+      {/* Main Container Layout */}
+      <div className="flex-1 flex max-w-7xl mx-auto w-full">
+        {/* Sidebar */}
+        <Sidebar
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          unreadAlertsCount={alerts.filter((a) => !a.acknowledged).length}
+          totalCasesCount={cases.length}
+          totalDocsCount={documents.length}
+          evidenceVaultCount={evidenceItems.length}
+          tamperAlertsCount={evidenceItems.filter((e) => e.isTampered).length}
+          activeThreatsCount={threats.filter((t) => t.status === 'ACTIVE').length}
+          sharedDocsCount={stats.sharedDocsCount}
+          officer={officer}
+          onOpenProfile={() => setIsProfileOpen(true)}
+          onLockSystem={() => setIsLocked(true)}
+          isMobileOpen={isMobileSidebarOpen}
+          onCloseMobile={() => setIsMobileSidebarOpen(false)}
+        />
 
-        {/* Content Body Rendering Dynamic Tab */}
-        <main className="flex-1 p-4 sm:p-6 md:p-8 max-w-7xl w-full mx-auto">
-          {/* TAB 1: CYBER FORENSICS COMMAND CENTER (DASHBOARD) */}
+        {/* Content Area */}
+        <main className="flex-1 lg:pl-72 p-4 sm:p-6 overflow-x-hidden">
+          {/* Sub-parts Tab Bar for Group Navigation */}
+          <SubSectionTabs
+            activeTab={activeTab}
+            onSelectTab={(tab) => setActiveTab(tab)}
+            tamperAlertsCount={evidenceItems.filter((e) => e.isTampered).length}
+            sharedDocsCount={stats.sharedDocsCount}
+            unreadAlertsCount={alerts.filter((a) => !a.acknowledged).length}
+            activeThreatsCount={threats.filter((t) => t.status === 'ACTIVE').length}
+          />
+
+          {/* 1. OVERVIEW TAB */}
           {activeTab === 'dashboard' && (
-            <CyberForensicsDashboard
+            <OverviewDashboard
               stats={stats}
+              cases={cases}
+              documents={documents}
               evidenceItems={evidenceItems}
               recentAudits={auditEvents}
-              activeThreats={threats}
-              onOpenIngestion={() => setIsIngestionOpen(true)}
-              onNavigate={(tab) => setActiveTab(tab as AppTab)}
-              onSelectEvidenceForIntegrity={(id) => {
-                setIntegritySelectedId(id);
-                setActiveTab('integrity');
-              }}
-              onToggleTerminal={() => setIsTerminalOpen(true)}
+              officer={officer}
+              onNavigate={(t) => setActiveTab(t)}
+              onOpenNewCase={() => setIsNewCaseOpen(true)}
+              onOpenUploadDoc={() => setIsUploadDocOpen(true)}
+              onOpenIngestEvidence={() => setIsIngestionOpen(true)}
+              onOpenDocDetail={(doc) => setSelectedDocument(doc)}
+              onOpenCaseDetail={(c) => setSelectedCase(c)}
             />
           )}
 
-          {/* TAB 2: DIGITAL EVIDENCE VAULT */}
+          {/* 2. CASES TAB */}
+          {activeTab === 'cases' && (
+            <div className="space-y-6 animate-fadeIn">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-4">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="px-2.5 py-0.5 rounded-full bg-slate-100 border border-slate-200 text-slate-700 text-xs font-semibold">
+                      Investigation Dockets
+                    </span>
+                    <span className="text-xs text-slate-500">• {cases.length} Registered Cases</span>
+                  </div>
+                  <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight mt-1">
+                    State Cyber & Criminal Investigation Dockets
+                  </h1>
+                </div>
+
+                <div className="flex items-center gap-2.5">
+                  <button
+                    onClick={() => setIsFilterOpen(true)}
+                    className="px-3.5 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold text-xs rounded-lg transition-colors flex items-center gap-1.5 shadow-2xs cursor-pointer"
+                  >
+                    <Filter className="w-3.5 h-3.5" />
+                    <span>Filter Cases</span>
+                  </button>
+                  <button
+                    onClick={() => setIsNewCaseOpen(true)}
+                    className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs rounded-lg transition-colors flex items-center gap-2 shadow-xs cursor-pointer"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span>New Case</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Case Cards Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {filteredCases.map((caseItem) => (
+                  <CaseCard
+                    key={caseItem.id}
+                    caseItem={caseItem}
+                    onClick={() => setSelectedCase(caseItem)}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* 3. DOCUMENT REPOSITORY TAB */}
+          {activeTab === 'documents' && (
+            <DocumentRepositoryView
+              documents={documents}
+              officer={officer}
+              onOpenDocDetail={(doc) => setSelectedDocument(doc)}
+              onOpenUploadDoc={() => setIsUploadDocOpen(true)}
+              onShareDoc={(doc) => {
+                setSelectedDocument(doc);
+              }}
+              onSignDoc={(docId) => handleSignDocument(docId)}
+              onVerifyDocHash={(doc) => setSelectedDocument(doc)}
+              onToggleLegalHold={(docId) => handleToggleLegalHold(docId)}
+              onDownloadDoc={(doc) => handleDownloadDoc(doc)}
+            />
+          )}
+
+          {/* 4. EVIDENCE VAULT TAB */}
           {activeTab === 'vault' && (
             <DigitalEvidenceVaultView
               evidenceItems={evidenceItems}
+              officer={officer}
               onOpenIngestion={() => setIsIngestionOpen(true)}
-              onSelectEvidenceForIntegrity={(id) => {
+              onInspectMetadata={(item) => setSelectedMetadataItem(item)}
+              onNavigateToIntegrity={(id) => {
                 setIntegritySelectedId(id);
                 setActiveTab('integrity');
               }}
-              onOpenChainOfCustody={(id) => {
+              onNavigateToCustody={(id) => {
                 setCustodySelectedId(id);
                 setActiveTab('custody');
               }}
-              onOpenMetadata={(item) => setSelectedMetadataItem(item)}
-              onOpenAIAnalysis={(id) => {
-                setNeuralSelectedId(id);
-                setActiveTab('neural');
+              onDownloadEvidence={(item) => {
+                logAudit(
+                  'DOCUMENT_DOWNLOAD',
+                  `Evidence ${item.name} downloaded under write-blocker inspection.`,
+                  'SUCCESS',
+                  'INFO',
+                  item.id,
+                  item.caseId
+                );
+                showToast('SUCCESS', 'Evidence Downloaded', `Generated stream for ${item.name}.`);
               }}
-              onRestoreEvidence={handleRestoreEvidence}
-              onDownloadEvidence={handleDownloadEvidence}
             />
           )}
 
-          {/* TAB 3: INTEGRITY ENGINE */}
+          {/* 5. FILE INTEGRITY ENGINE TAB */}
           {activeTab === 'integrity' && (
             <IntegrityEngineView
               evidenceItems={evidenceItems}
-              onVerifyEvidence={handleVerifyEvidence}
-              onRestoreEvidence={handleRestoreEvidence}
+              initialSelectedId={integritySelectedId}
+              onVerifyHash={(id) => {
+                logAudit('INTEGRITY_VERIFIED', `Recalculated SHA-256 hash for artifact ${id}. Match confirmed.`, 'SUCCESS', 'INFO', id);
+                showToast('SUCCESS', 'SHA-256 Verified', `Evidence artifact ${id} matches original bitstream.`);
+              }}
             />
           )}
 
-          {/* TAB 4: CHAIN OF CUSTODY */}
+          {/* 6. CHAIN OF CUSTODY TAB */}
           {activeTab === 'custody' && (
             <ChainOfCustodyView
               custodyEvents={custodyEvents}
               evidenceItems={evidenceItems}
               currentOfficer={officer}
-              onAddCustodyEvent={handleAddCustodyEvent}
               initialSelectedEvidenceId={custodySelectedId}
+              onAddCustodyEvent={(event) => {
+                setCustodyEvents((prev) => [event, ...prev]);
+                logAudit(
+                  'EVIDENCE_TRANSFERRED',
+                  `Logged custody transfer for ${event.evidenceId} to ${event.location}.`,
+                  'SUCCESS',
+                  'INFO',
+                  event.evidenceId,
+                  event.caseId
+                );
+                showToast('SUCCESS', 'Custody Transferred', `Recorded transfer ledger entry ${event.id}.`);
+              }}
             />
           )}
 
-          {/* TAB 5: THREAT MONITOR */}
-          {activeTab === 'threats' && (
-            <ThreatMonitorView
-              threats={threats}
-              onMitigateThreat={handleMitigateThreat}
+          {/* 7. SECURE COLLABORATION TAB */}
+          {activeTab === 'collaboration' && (
+            <SecureCollaborationView
+              documents={documents}
+              officer={officer}
+              onOpenDocDetail={(doc) => setSelectedDocument(doc)}
+              onRevokeShare={handleRevokeShare}
+              onAddShare={handleAddShare}
             />
           )}
 
-          {/* TAB 6: NEURAL FORENSICS (AI OCR & NER) */}
-          {activeTab === 'neural' && (
-            <NeuralForensicsView
-              analyses={aiAnalyses}
-              evidenceItems={evidenceItems}
-              initialSelectedEvidenceId={neuralSelectedId}
-            />
-          )}
-
-          {/* TAB 7: DIGITAL SIGNATURES & PKI */}
-          {activeTab === 'signatures' && (
-            <SignatureVerificationView
-              evidenceItems={evidenceItems}
-              currentOfficer={officer}
-              onSignEvidence={handleSignEvidence}
-            />
-          )}
-
-          {/* TAB 8: FORENSIC SECURITY TIMELINE (AUDIT LOG) */}
-          {activeTab === 'timeline' && (
-            <SecurityTimelineView auditEvents={auditEvents} />
-          )}
-
-          {/* TAB 9: ACCESS CONTROL & ZERO TRUST */}
+          {/* 8. ACCESS CONTROL & RBAC TAB */}
           {activeTab === 'access' && (
             <AccessControlView
               sessions={activeSessions}
               currentOfficer={officer}
-              onRevokeSession={handleRevokeSession}
+              onRevokeSession={(sessionId) => {
+                setActiveSessions((prev) => prev.filter((s) => s.id !== sessionId));
+                logAudit('LOGOUT', `Revoked active user session ${sessionId}.`, 'SUCCESS', 'WARNING');
+                showToast('SUCCESS', 'Session Terminated', `Session ${sessionId} has been invalidated.`);
+              }}
+              onSwitchOfficerRole={(newRole, clearance) => {
+                setOfficer((prev) => ({
+                  ...prev,
+                  roles: [newRole],
+                  clearanceLevel: clearance.includes('4') ? 4 : clearance.includes('3') ? 3 : clearance.includes('2') ? 2 : 1,
+                  clearanceName: clearance,
+                }));
+                showToast('SUCCESS', 'Role Switched', `Switched active workstation identity to ${newRole}.`);
+              }}
             />
           )}
 
-          {/* TAB 10: LEGAL CASE DOCKETS (PRESERVED EXISTING) */}
-          {activeTab === 'cases' && (
-            <div className="space-y-6 font-technical">
-              <div className="border-b border-slate-200 pb-5 flex flex-col md:flex-row md:items-end justify-between gap-4">
-                <div>
-                  <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-wider">
-                    LEGAL CASE DOCKETS & INVESTIGATION FILES
-                  </h1>
-                  <p className="text-xs text-slate-500 font-mono mt-1">
-                    STATUTORY REPOSITORY // {cases.length} TOTAL REGISTERED DOCKETS
-                  </p>
-                </div>
-
-                {/* Actions & Search */}
-                <div className="flex flex-wrap items-center gap-2">
-                  <div className="relative">
-                    <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" />
-                    <input
-                      type="text"
-                      placeholder="Filter dockets..."
-                      value={filters.searchQuery}
-                      onChange={(e) =>
-                        setFilters((prev) => ({ ...prev, searchQuery: e.target.value }))
-                      }
-                      className="bg-white border border-slate-300 focus:border-slate-900 text-xs text-slate-900 pl-8 pr-3 py-1.5 rounded-lg focus:outline-none placeholder:text-slate-400 w-44 sm:w-56 font-mono shadow-2xs"
-                    />
-                  </div>
-
-                  <button
-                    onClick={() => setIsFilterOpen(true)}
-                    className={`border font-technical text-xs px-3 py-1.5 flex items-center gap-1.5 rounded-lg transition-colors cursor-pointer font-medium ${
-                      hasActiveFilters
-                        ? 'bg-slate-900 text-white border-slate-900'
-                        : 'bg-white border-slate-300 text-slate-700 hover:bg-slate-50'
-                    }`}
-                  >
-                    <Filter className="w-3.5 h-3.5" />
-                    <span>FILTERS</span>
-                    {hasActiveFilters && (
-                      <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
-                    )}
-                  </button>
-
-                  <button
-                    onClick={() => setIsNewCaseOpen(true)}
-                    className="bg-slate-900 hover:bg-slate-800 text-white font-technical text-xs px-3.5 py-1.5 flex items-center gap-1.5 shadow-xs transition-all rounded-lg font-medium cursor-pointer"
-                  >
-                    <Plus className="w-3.5 h-3.5" />
-                    <span>NEW CASE</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* Active Filter Badges */}
-              {hasActiveFilters && (
-                <div className="p-2.5 bg-slate-100 border border-slate-200 rounded-lg flex flex-wrap items-center justify-between gap-2 font-technical text-xs">
-                  <div className="flex flex-wrap items-center gap-1.5">
-                    <span className="text-slate-500 font-semibold uppercase text-[10px]">
-                      ACTIVE FILTERS:
-                    </span>
-                    {filters.searchQuery && (
-                      <span className="px-2 py-0.5 rounded bg-white text-slate-800 font-mono text-[11px] border border-slate-200">
-                        &quot;{filters.searchQuery}&quot;
-                      </span>
-                    )}
-                    {filters.status !== 'ALL' && (
-                      <span className="px-2 py-0.5 rounded bg-white text-slate-800 font-mono text-[11px] border border-slate-200">
-                        {filters.status}
-                      </span>
-                    )}
-                    {filters.classification !== 'ALL' && (
-                      <span className="px-2 py-0.5 rounded bg-white text-slate-800 font-mono text-[11px] border border-slate-200">
-                        {filters.classification}
-                      </span>
-                    )}
-                    {filters.leadOfficer !== 'ALL' && (
-                      <span className="px-2 py-0.5 rounded bg-white text-slate-800 font-mono text-[11px] border border-slate-200">
-                        {filters.leadOfficer}
-                      </span>
-                    )}
-                  </div>
-
-                  <button
-                    onClick={resetFilters}
-                    className="text-slate-500 hover:text-slate-900 flex items-center gap-1 text-[11px] font-semibold cursor-pointer"
-                  >
-                    <X className="w-3 h-3" />
-                    <span>CLEAR</span>
-                  </button>
-                </div>
-              )}
-
-              {/* Cases Grid */}
-              {filteredCases.length === 0 ? (
-                <div className="p-12 text-center bg-white border border-slate-200 rounded-xl space-y-3 font-technical shadow-xs">
-                  <FolderKanban className="w-8 h-8 text-slate-400 mx-auto" />
-                  <h3 className="text-xs font-bold text-slate-800 uppercase">
-                    NO CASES MATCH CRITERIA
-                  </h3>
-                  <button
-                    onClick={resetFilters}
-                    className="px-3 py-1.5 rounded-lg bg-slate-100 border border-slate-200 text-slate-700 hover:bg-slate-200 text-xs font-medium cursor-pointer"
-                  >
-                    RESET FILTERS
-                  </button>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
-                  {filteredCases.map((caseItem) => (
-                    <CaseCard
-                      key={caseItem.id}
-                      caseData={caseItem}
-                      onOpenCase={(item) => setSelectedCase(item)}
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
+          {/* 9. AUDIT TRAIL TAB */}
+          {activeTab === 'timeline' && (
+            <SecurityTimelineView auditEvents={auditEvents} />
           )}
 
-          {/* TAB 11: CLASSIFIED DOCUMENTS */}
-          {activeTab === 'documents' && (
-            <DocumentsView
-              cases={cases}
-              onOpenCase={(item) => setSelectedCase(item)}
+          {/* 10. DIGITAL SIGNATURES TAB */}
+          {activeTab === 'signatures' && (
+            <SignatureVerificationView
+              evidenceItems={evidenceItems}
+              currentOfficer={officer}
+              onSignEvidence={(id, signerName) => {
+                setEvidenceItems((prev) =>
+                  prev.map((e) =>
+                    e.id === id ? { ...e, signatureStatus: 'VALID', signerName } : e
+                  )
+                );
+                logAudit('DIGITAL_SIGNATURE_APPLIED', `Signed artifact ${id} by ${signerName}.`, 'SUCCESS', 'INFO', id);
+                showToast('SUCCESS', 'Signature Stamped', `PKI signature validated on ${id}.`);
+              }}
             />
           )}
 
-          {/* TAB 12: SYSTEM ALERTS */}
+          {/* 11. DOCUMENT INTELLIGENCE TAB */}
+          {activeTab === 'intelligence' && (
+            <DocumentIntelligenceView
+              analyses={aiAnalyses}
+              documents={documents}
+              evidenceItems={evidenceItems}
+              initialSelectedId={intelligenceSelectedId}
+            />
+          )}
+
+          {/* 12. LIFECYCLE & LEGAL HOLD TAB */}
+          {activeTab === 'lifecycle' && (
+            <LifecycleSettingsView
+              documents={documents}
+              officer={officer}
+              onToggleLegalHold={handleToggleLegalHold}
+              onOpenDocDetail={(doc) => setSelectedDocument(doc)}
+            />
+          )}
+
+          {/* 13. ALERTS TAB */}
           {activeTab === 'alerts' && (
-            <AlertsView
-              alerts={alerts}
-              cases={cases}
-              onAcknowledge={handleAcknowledgeAlert}
-              onOpenCase={(item) => setSelectedCase(item)}
+            <SecurityEventsView
+              events={threats}
+              officer={officer}
+              onAcknowledgeEvent={(id) => {
+                setThreats((prev) =>
+                  prev.map((t) => (t.id === id ? { ...t, status: 'RESOLVED' } : t))
+                );
+                showToast('SUCCESS', 'Event Acknowledged', `Incident ${id} marked as resolved.`);
+              }}
             />
           )}
         </main>
       </div>
 
-      {/* Floating or Embedded Cyber Forensics Hacker CLI Terminal */}
-      <HackerTerminal
-        isOpen={isTerminalOpen}
-        onClose={() => setIsTerminalOpen(false)}
-        evidenceItems={evidenceItems}
-        onVerifyEvidence={handleVerifyEvidence}
-        onOpenIngestion={() => {
-          setIsTerminalOpen(false);
-          setIsIngestionOpen(true);
-        }}
-        auditEvents={auditEvents}
-      />
-
-      {/* 9-Step Artifact Ingestion Modal */}
-      <ArtifactIngestionModal
-        isOpen={isIngestionOpen}
-        onClose={() => setIsIngestionOpen(false)}
-        onIngestSuccess={handleIngestSuccess}
-        caseIdList={cases.map((c) => c.id)}
-      />
-
-      {/* Deep Metadata Forensics Modal */}
-      <MetadataForensicsModal
-        isOpen={!!selectedMetadataItem}
-        onClose={() => setSelectedMetadataItem(null)}
-        evidence={selectedMetadataItem}
-      />
-
-      {/* Case Detail Dossier Modal */}
+      {/* Global Modals */}
       {selectedCase && (
         <CaseDetailModal
-          caseData={selectedCase}
+          caseItem={selectedCase}
           onClose={() => setSelectedCase(null)}
-          onUpdateCase={handleUpdateCase}
+          onUpdateCase={(updatedCase) => {
+            setCases((prev) =>
+              prev.map((c) => (c.id === updatedCase.id ? updatedCase : c))
+            );
+          }}
         />
       )}
 
-      {/* Filter Modal */}
-      <FilterModal
-        isOpen={isFilterOpen}
-        onClose={() => setIsFilterOpen(false)}
-        filters={filters}
-        setFilters={setFilters}
-        onReset={resetFilters}
-        matchingCount={filteredCases.length}
-      />
+      {selectedDocument && (
+        <SecureDocumentModal
+          document={selectedDocument}
+          officer={officer}
+          onClose={() => setSelectedDocument(null)}
+          onUploadNewVersion={handleUploadNewVersion}
+          onRestoreVersion={handleRestoreVersion}
+          onAddShare={handleAddShare}
+          onRevokeShare={handleRevokeShare}
+          onSignDocument={handleSignDocument}
+          onToggleLegalHold={handleToggleLegalHold}
+          onDownload={handleDownloadDoc}
+        />
+      )}
 
-      {/* New Case Creation Modal */}
-      <NewCaseModal
-        isOpen={isNewCaseOpen}
-        onClose={() => setIsNewCaseOpen(false)}
-        onSaveCase={handleSaveNewCase}
-        existingCount={cases.length}
-      />
+      {isUploadDocOpen && (
+        <UploadDocumentModal
+          cases={cases}
+          officer={officer}
+          onClose={() => setIsUploadDocOpen(false)}
+          onUploadSuccess={handleUploadNewDocument}
+        />
+      )}
 
-      {/* User Profile / Security Credentials Modal */}
-      <UserProfileModal
-        isOpen={isProfileOpen}
-        onClose={() => setIsProfileOpen(false)}
-        officer={officer}
-        onLockSystem={() => setIsLocked(true)}
-      />
+      {isNewCaseOpen && (
+        <NewCaseModal
+          officer={officer}
+          onClose={() => setIsNewCaseOpen(false)}
+          onCreateCase={(newCase) => {
+            setCases((prev) => [newCase, ...prev]);
+            logAudit('CASE_CREATED', `Registered new investigation case "${newCase.title}" (${newCase.id}).`, 'SUCCESS', 'INFO', undefined, newCase.id);
+            showToast('SUCCESS', 'Case Docket Created', `Registered ${newCase.id} successfully.`);
+          }}
+        />
+      )}
+
+      {isFilterOpen && (
+        <FilterModal
+          filters={filters}
+          onApply={(newFilters) => setFilters(newFilters)}
+          onReset={resetFilters}
+          onClose={() => setIsFilterOpen(false)}
+        />
+      )}
+
+      {isGlobalSearchOpen && (
+        <GlobalSearchModal
+          cases={cases}
+          documents={documents}
+          evidenceItems={evidenceItems}
+          audits={auditEvents}
+          onClose={() => setIsGlobalSearchOpen(false)}
+          onSelectDoc={(doc) => setSelectedDocument(doc)}
+          onSelectCase={(c) => setSelectedCase(c)}
+          onNavigateTab={(t) => setActiveTab(t)}
+        />
+      )}
+
+      {isIngestionOpen && (
+        <ArtifactIngestionModal
+          onClose={() => setIsIngestionOpen(false)}
+          onIngestionComplete={(newItem) => {
+            setEvidenceItems((prev) => [newItem, ...prev]);
+            logAudit('EVIDENCE_TRANSFERRED', `Ingested forensic evidence ${newItem.name} (${newItem.id}).`, 'SUCCESS', 'INFO', newItem.id, newItem.caseId);
+            showToast('SUCCESS', 'Evidence Ingested', `Artifact ${newItem.id} secured in vault.`);
+          }}
+        />
+      )}
+
+      {selectedMetadataItem && (
+        <MetadataForensicsModal
+          item={selectedMetadataItem}
+          onClose={() => setSelectedMetadataItem(null)}
+        />
+      )}
+
+      {isProfileOpen && (
+        <UserProfileModal
+          officer={officer}
+          onClose={() => setIsProfileOpen(false)}
+          onLock={() => {
+            setIsProfileOpen(false);
+            setIsLocked(true);
+          }}
+        />
+      )}
+
+      {/* Global Toast Notification */}
+      {toastMessage && (
+        <div
+          className={`fixed bottom-5 right-5 z-50 p-4 rounded-xl border shadow-xl flex items-start gap-3 max-w-sm animate-slideUp ${
+            toastMessage.type === 'SUCCESS'
+              ? 'bg-emerald-900 text-white border-emerald-700'
+              : toastMessage.type === 'DENIED'
+              ? 'bg-rose-900 text-white border-rose-700'
+              : 'bg-slate-900 text-white border-slate-700'
+          }`}
+        >
+          {toastMessage.type === 'SUCCESS' ? (
+            <CheckCircle2 className="w-5 h-5 text-emerald-300 shrink-0 mt-0.5" />
+          ) : toastMessage.type === 'DENIED' ? (
+            <AlertTriangle className="w-5 h-5 text-rose-300 shrink-0 mt-0.5" />
+          ) : (
+            <ShieldAlert className="w-5 h-5 text-amber-300 shrink-0 mt-0.5" />
+          )}
+
+          <div className="min-w-0">
+            <div className="font-bold text-xs">{toastMessage.title}</div>
+            <div className="text-[11px] opacity-90 leading-tight mt-0.5">
+              {toastMessage.description}
+            </div>
+          </div>
+
+          <button
+            onClick={() => setToastMessage(null)}
+            className="p-0.5 hover:opacity-75 cursor-pointer ml-auto"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      )}
     </div>
   );
 }

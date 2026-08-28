@@ -23,25 +23,36 @@ import { EvidenceItem, EvidenceType } from '../types';
 
 interface DigitalEvidenceVaultViewProps {
   evidenceItems: EvidenceItem[];
+  officer?: any;
   onOpenIngestion: () => void;
-  onSelectEvidenceForIntegrity: (id: string) => void;
-  onOpenChainOfCustody: (id: string) => void;
-  onOpenMetadata: (item: EvidenceItem) => void;
-  onOpenAIAnalysis: (id: string) => void;
-  onRestoreEvidence: (id: string) => void;
+  onSelectEvidenceForIntegrity?: (id: string) => void;
+  onNavigateToIntegrity?: (id: string) => void;
+  onOpenChainOfCustody?: (id: string) => void;
+  onNavigateToCustody?: (id: string) => void;
+  onOpenMetadata?: (item: EvidenceItem) => void;
+  onInspectMetadata?: (item: EvidenceItem) => void;
+  onOpenAIAnalysis?: (id: string) => void;
+  onRestoreEvidence?: (id: string) => void;
   onDownloadEvidence: (item: EvidenceItem) => void;
 }
 
 export const DigitalEvidenceVaultView: React.FC<DigitalEvidenceVaultViewProps> = ({
   evidenceItems,
+  officer,
   onOpenIngestion,
   onSelectEvidenceForIntegrity,
+  onNavigateToIntegrity,
   onOpenChainOfCustody,
+  onNavigateToCustody,
   onOpenMetadata,
+  onInspectMetadata,
   onOpenAIAnalysis,
   onRestoreEvidence,
   onDownloadEvidence,
 }) => {
+  const handleIntegrity = onNavigateToIntegrity || onSelectEvidenceForIntegrity || (() => {});
+  const handleCustody = onNavigateToCustody || onOpenChainOfCustody || (() => {});
+  const handleMetadata = onInspectMetadata || onOpenMetadata || (() => {});
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedType, setSelectedType] = useState<string>('ALL');
   const [selectedClassification, setSelectedClassification] = useState<string>('ALL');
@@ -295,7 +306,7 @@ export const DigitalEvidenceVaultView: React.FC<DigitalEvidenceVaultViewProps> =
                 <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-100">
                   <div className="flex items-center gap-1.5 flex-wrap">
                     <button
-                      onClick={() => onOpenMetadata(ev)}
+                      onClick={() => handleMetadata(ev)}
                       title="Inspect Metadata & Technical Exif"
                       className="px-2.5 py-1.5 rounded-lg bg-white hover:bg-slate-50 text-slate-700 text-xs font-medium flex items-center gap-1 border border-slate-200 transition-colors cursor-pointer shadow-2xs"
                     >
@@ -304,7 +315,7 @@ export const DigitalEvidenceVaultView: React.FC<DigitalEvidenceVaultViewProps> =
                     </button>
 
                     <button
-                      onClick={() => onSelectEvidenceForIntegrity(ev.id)}
+                      onClick={() => handleIntegrity(ev.id)}
                       title="Verify SHA-256 Integrity"
                       className="px-2.5 py-1.5 rounded-lg bg-white hover:bg-slate-50 text-slate-700 text-xs font-medium flex items-center gap-1 border border-slate-200 transition-colors cursor-pointer shadow-2xs"
                     >
@@ -313,7 +324,7 @@ export const DigitalEvidenceVaultView: React.FC<DigitalEvidenceVaultViewProps> =
                     </button>
 
                     <button
-                      onClick={() => onOpenChainOfCustody(ev.id)}
+                      onClick={() => handleCustody(ev.id)}
                       title="View Chain of Custody History"
                       className="px-2.5 py-1.5 rounded-lg bg-white hover:bg-slate-50 text-slate-700 text-xs font-medium flex items-center gap-1 border border-slate-200 transition-colors cursor-pointer shadow-2xs"
                     >
@@ -321,18 +332,20 @@ export const DigitalEvidenceVaultView: React.FC<DigitalEvidenceVaultViewProps> =
                       <span>Custody</span>
                     </button>
 
-                    <button
-                      onClick={() => onOpenAIAnalysis(ev.id)}
-                      title="Run AI Smart Analysis"
-                      className="px-2.5 py-1.5 rounded-lg bg-white hover:bg-slate-50 text-slate-700 text-xs font-medium flex items-center gap-1 border border-slate-200 transition-colors cursor-pointer shadow-2xs"
-                    >
-                      <Sparkles className="w-3.5 h-3.5 text-slate-500" />
-                      <span>AI Scan</span>
-                    </button>
+                    {onOpenAIAnalysis && (
+                      <button
+                        onClick={() => onOpenAIAnalysis(ev.id)}
+                        title="Run AI Smart Analysis"
+                        className="px-2.5 py-1.5 rounded-lg bg-white hover:bg-slate-50 text-slate-700 text-xs font-medium flex items-center gap-1 border border-slate-200 transition-colors cursor-pointer shadow-2xs"
+                      >
+                        <Sparkles className="w-3.5 h-3.5 text-slate-500" />
+                        <span>AI Scan</span>
+                      </button>
+                    )}
                   </div>
 
                   <div className="flex items-center gap-1.5">
-                    {isTampered && (
+                    {isTampered && onRestoreEvidence && (
                       <button
                         onClick={() => onRestoreEvidence(ev.id)}
                         title="Restore Original File Version"

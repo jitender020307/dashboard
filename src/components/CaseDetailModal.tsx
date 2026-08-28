@@ -22,16 +22,21 @@ import {
 import { CaseItem, EvidenceItem, CustodyEvent } from '../types';
 
 interface CaseDetailModalProps {
-  caseData: CaseItem;
+  caseItem?: CaseItem;
+  caseData?: CaseItem;
   onClose: () => void;
   onUpdateCase: (updated: CaseItem) => void;
 }
 
 export const CaseDetailModal: React.FC<CaseDetailModalProps> = ({
-  caseData,
+  caseItem,
+  caseData: caseDataProp,
   onClose,
   onUpdateCase,
 }) => {
+  const caseData = caseItem || caseDataProp;
+  if (!caseData) return null;
+
   const [activeTab, setActiveTab] = useState<
     'evidence' | 'custody' | 'suspects' | 'documents' | 'timeline'
   >('evidence');
@@ -56,7 +61,7 @@ export const CaseDetailModal: React.FC<CaseDetailModalProps> = ({
   // Manifest Print / Export state
   const [showExportManifest, setShowExportManifest] = useState(false);
 
-  const isTopSecret = caseData.classification === 'TOP SECRET';
+  const isTopSecret = caseData.classification === 'HIGHLY_RESTRICTED';
 
   const copyIntegrityHash = async () => {
     try {

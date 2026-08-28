@@ -9,18 +9,21 @@ import {
 import { OfficerProfile } from '../types';
 
 interface UserProfileModalProps {
-  isOpen: boolean;
+  isOpen?: boolean;
   onClose: () => void;
   officer: OfficerProfile;
-  onLockSystem: () => void;
+  onLockSystem?: () => void;
+  onLock?: () => void;
 }
 
 export const UserProfileModal: React.FC<UserProfileModalProps> = ({
-  isOpen,
+  isOpen = true,
   onClose,
   officer,
   onLockSystem,
+  onLock,
 }) => {
+  const handleLock = onLock || onLockSystem || (() => {});
   if (!isOpen) return null;
 
   return (
@@ -103,7 +106,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
           <button
             onClick={() => {
               onClose();
-              onLockSystem();
+              handleLock();
             }}
             className="w-full py-2 rounded bg-zinc-100 border border-zinc-300 text-zinc-800 hover:bg-zinc-200 hover:text-black font-bold flex items-center justify-center gap-2 transition-all cursor-pointer text-xs"
           >

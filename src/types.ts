@@ -1,25 +1,30 @@
-export type CaseStatus = 'ACTIVE' | 'PENDING REVIEW' | 'UNDER TRIAL' | 'RESOLVED' | 'ARCHIVED';
+export type CaseStatus = 'ACTIVE' | 'UNDER_INVESTIGATION' | 'CHARGE_SHEETED' | 'UNDER_TRIAL' | 'RESOLVED' | 'ARCHIVED';
 
-export type ClassificationLevel = 'CONFIDENTIAL' | 'RESTRICTED' | 'TOP SECRET' | 'UNCLASSIFIED';
+export type ClassificationLevel = 'UNCLASSIFIED' | 'INTERNAL' | 'CONFIDENTIAL' | 'RESTRICTED' | 'HIGHLY_RESTRICTED';
 
-export type UserRole = 'SUPER_ADMIN' | 'INVESTIGATOR' | 'FORENSIC_ANALYST' | 'AUDITOR' | 'JUDGE' | 'GUEST' | string;
+export type UserRole = 
+  | 'ADMINISTRATOR'
+  | 'INVESTIGATING_OFFICER'
+  | 'FORENSIC_ANALYST'
+  | 'LEGAL_OFFICER'
+  | 'REVIEWER'
+  | 'AUDITOR';
 
-export type ClearanceLevel = 'TOP SECRET' | 'RESTRICTED' | 'CONFIDENTIAL' | 'UNCLASSIFIED' | string;
+export type ClearanceLevel = 'LEVEL 1 (UNCLASSIFIED)' | 'LEVEL 2 (CONFIDENTIAL)' | 'LEVEL 3 (RESTRICTED)' | 'LEVEL 4 (HIGHLY RESTRICTED)';
 
 export type EvidenceType = 
   | 'DIGITAL_STORAGE'
-  | 'AUDIO_INTERCEPT'
+  | 'AUDIO_RECORDING'
   | 'VIDEO_SURVEILLANCE'
-  | 'BALLISTICS'
-  | 'FINANCIAL_LEDGER'
-  | 'PHYSICAL_SAMPLE'
-  | 'BIOMETRIC'
+  | 'MEMORY_DUMP'
   | 'DOC_PDF'
   | 'DOC_SCAN'
-  | 'MEMORY_DUMP'
+  | 'FINANCIAL_LEDGER'
+  | 'MOBILE_EXTRACT'
+  | 'NETWORK_PCAP'
   | string;
 
-export type EvidenceStatus = 'IN_VAULT' | 'FORENSIC_LAB' | 'COURT_EVIDENCE' | 'CHECKED_OUT' | 'ARCHIVED' | string;
+export type EvidenceStatus = 'IN_VAULT' | 'FORENSIC_LAB' | 'COURT_EVIDENCE' | 'CHECKED_OUT' | 'ARCHIVED';
 
 export interface MetadataRecord {
   fileName?: string;
@@ -51,6 +56,102 @@ export interface MetadataRecord {
   [key: string]: any;
 }
 
+export interface DocumentVersion {
+  versionNumber: number; // 1, 2, 3...
+  versionTag: string; // 'v1.0', 'v1.1', 'v2.0'
+  author: string;
+  authorRole: string;
+  timestamp: string;
+  changeDescription: string;
+  sha256Hash: string;
+  fileSize: string;
+  signatureStatus: 'VALID' | 'PENDING' | 'UNSIGNED';
+  signerName?: string;
+  isCurrent: boolean;
+  downloadUrl?: string;
+}
+
+export interface SharedAccessRecord {
+  id: string;
+  documentId: string;
+  documentTitle: string;
+  sharedWithUserId: string;
+  sharedWithUserName: string;
+  sharedWithRole: string;
+  sharedByUserName: string;
+  permission: 'VIEW' | 'COMMENT' | 'EDIT' | 'DOWNLOAD';
+  sharedAt: string;
+  expiresAt: string; // e.g. "7 Days (2026-09-04)"
+  status: 'ACTIVE' | 'EXPIRED' | 'REVOKED';
+  notes?: string;
+}
+
+export type DocumentLifecycleStage = 'DRAFT' | 'SUBMITTED' | 'UNDER_REVIEW' | 'APPROVED' | 'FINAL' | 'ARCHIVED';
+
+export type DocumentCategory = 
+  | 'FIR'
+  | 'INVESTIGATION_REPORT'
+  | 'CASE_DIARY'
+  | 'WITNESS_STATEMENT'
+  | 'SEIZURE_MEMO'
+  | 'FORENSIC_REPORT'
+  | 'DIGITAL_EVIDENCE_REPORT'
+  | 'LEGAL_NOTICE'
+  | 'CHARGE_SHEET'
+  | 'COURT_FILING'
+  | 'SUPPORTING_DOCUMENT';
+
+export interface ManagedDocument {
+  id: string;
+  caseId: string;
+  title: string;
+  category: DocumentCategory;
+  fileExtension: string;
+  fileSize: string;
+  owner: string;
+  ownerRole: string;
+  dateCreated: string;
+  lastModified: string;
+  classification: ClassificationLevel;
+  lifecycleStatus: DocumentLifecycleStage;
+  currentVersion: string; // 'v2.0'
+  versions: DocumentVersion[];
+  sha256Hash: string;
+  isIntegrityVerified: boolean;
+  digitalSignatureStatus: 'VALID' | 'PENDING' | 'UNVERIFIED';
+  signerName?: string;
+  signatureTimestamp?: string;
+  accessClearanceRequired: number; // 1 to 4
+  lastAccessedBy?: string;
+  lastAccessedDate?: string;
+  retentionYears: number;
+  retentionExpiryDate: string;
+  legalHold: boolean; // Flag preventing deletion while case is under legal preservation
+  contentSummary: string;
+  tags: string[];
+  sharedWith: SharedAccessRecord[];
+  metadata?: MetadataRecord;
+  fullText?: string;
+}
+
+// Retain legacy CaseDocument type mapping for backward compatibility with case cards
+export interface CaseDocument {
+  id: string;
+  title: string;
+  category: string;
+  dateCreated: string;
+  author: string;
+  classification: ClassificationLevel;
+  contentSnippet: string;
+  fullText?: string;
+  pagesCount: number;
+  status: string;
+  caseId: string;
+  sha256Hash?: string;
+  digitalSignature?: string;
+  isSigned?: boolean;
+}
+
 export interface EvidenceItem {
   id: string;
   name: string;
@@ -68,7 +169,7 @@ export interface EvidenceItem {
   classification?: ClassificationLevel;
   currentHashSha256?: string;
   isTampered?: boolean;
-  encryptionStatus?: 'AES-256-GCM' | 'RSA-4096' | 'CHACHA20-POLY1305' | string;
+  encryptionStatus?: string;
   signatureStatus?: 'VALID' | 'INVALID' | 'UNVERIFIED' | string;
   signerName?: string;
   fileSize?: string;
@@ -93,23 +194,6 @@ export interface CustodyEvent {
   remarks?: string;
   details?: string;
   verified: boolean;
-}
-
-export interface CaseDocument {
-  id: string;
-  title: string;
-  category: 'SEARCH_WARRANT' | 'FORENSIC_ANALYSIS' | 'INTERCEPT_TRANSCRIPT' | 'BALLISTIC_REPORT' | 'WITNESS_DEPOSITION' | 'COURT_ORDER' | 'FIR_RECORD' | string;
-  dateCreated: string;
-  author: string;
-  classification: ClassificationLevel;
-  contentSnippet: string;
-  fullText?: string;
-  pagesCount: number;
-  status: 'VERIFIED' | 'PENDING_APPROVAL' | 'SEALED' | string;
-  caseId: string;
-  sha256Hash?: string;
-  digitalSignature?: string;
-  isSigned?: boolean;
 }
 
 export interface SuspectProfile {
@@ -142,6 +226,8 @@ export interface CaseItem {
     rank: string;
     department: string;
   };
+  department: string;
+  location: string;
   documentsCount: number;
   evidenceCount: number;
   dateInitiated: string;
@@ -155,27 +241,32 @@ export interface CaseItem {
   timeline: CaseTimelineEvent[];
   integrityHash: string;
   securityClearanceLevel: 1 | 2 | 3 | 4;
+  legalHold: boolean;
 }
 
 export type AuditActionType =
   | 'LOGIN'
   | 'LOGOUT'
-  | 'UPLOAD'
-  | 'DOWNLOAD'
-  | 'VIEW'
-  | 'SHARE'
-  | 'DELETE'
-  | 'HASH_GENERATED'
-  | 'HASH_VERIFIED'
-  | 'HASH_MISMATCH'
-  | 'SIGNATURE_CREATED'
+  | 'DOCUMENT_UPLOAD'
+  | 'DOCUMENT_VIEW'
+  | 'DOCUMENT_DOWNLOAD'
+  | 'DOCUMENT_MODIFICATION'
+  | 'VERSION_CREATED'
+  | 'VERSION_RESTORED'
+  | 'DOCUMENT_SHARED'
+  | 'SHARE_REVOKED'
+  | 'PERMISSION_CHANGED'
+  | 'DIGITAL_SIGNATURE_APPLIED'
   | 'SIGNATURE_VERIFIED'
+  | 'HASH_GENERATED'
+  | 'INTEGRITY_VERIFIED'
+  | 'HASH_MISMATCH_ALERT'
   | 'ACCESS_GRANTED'
   | 'ACCESS_DENIED'
   | 'EVIDENCE_TRANSFERRED'
   | 'CASE_CREATED'
-  | 'MALWARE_SCAN_PASSED'
-  | 'TAMPER_SIMULATION_TRIGGERED'
+  | 'CASE_MODIFIED'
+  | 'LEGAL_HOLD_TOGGLED'
   | string;
 
 export interface AuditEvent {
@@ -191,12 +282,12 @@ export interface AuditEvent {
   ip: string;
   device: string;
   result: 'SUCCESS' | 'DENIED' | 'ALERT' | 'FAILED' | string;
-  severity: 'INFO' | 'WARNING' | 'CRITICAL' | string;
+  severity: 'INFO' | 'WARNING' | 'CRITICAL';
   details: string;
   hashRecord?: string;
 }
 
-export interface SecurityThreat {
+export interface SecurityEvent {
   id: string;
   timestamp: string;
   severity: 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW';
@@ -204,10 +295,13 @@ export interface SecurityThreat {
   description: string;
   sourceIp: string;
   targetResource: string;
-  status: 'ACTIVE' | 'INVESTIGATING' | 'MITIGATED' | 'BLOCKED';
-  vector: string;
+  status: 'ACTIVE' | 'INVESTIGATING' | 'MITIGATED' | 'RESOLVED';
+  eventType: 'UNAUTHORIZED_ACCESS' | 'CLEARANCE_MISMATCH' | 'EXPIRED_TOKEN' | 'INTEGRITY_ALERT' | 'UNAUTHORIZED_DOWNLOAD' | 'RATE_LIMIT_EXCEEDED';
   actionTaken?: string;
 }
+
+// Retain alias for existing imports
+export type SecurityThreat = SecurityEvent;
 
 export interface SecurityAlert {
   id: string;
@@ -231,28 +325,32 @@ export interface OfficerProfile {
   activeSessionDuration: string;
   terminalNode: string;
   publicKey?: string;
-  roles: string[];
+  roles: UserRole[];
 }
 
 export interface ExtractedEntity {
-  category: 'PERSON' | 'LOCATION' | 'DATE' | 'CASE NUMBER' | 'POLICE STATION' | 'LEGAL SECTION' | 'IP_ADDRESS' | 'CRYPTOCURRENCY_WALLET' | string;
+  category: 'OFFICER' | 'ACCUSED / PERSON' | 'LOCATION' | 'DATE' | 'CASE NUMBER' | 'POLICE STATION' | 'LEGAL SECTION' | 'IP_ADDRESS' | 'PHONE_NUMBER' | 'VEHICLE_NO' | string;
   value: string;
   confidence: number;
 }
 
-export interface AIForensicAnalysis {
+export interface DocumentIntelligenceAnalysis {
   documentId: string;
   documentName: string;
   caseId: string;
   ocrConfidence: number;
-  documentType: 'FIR' | 'CHARGE_SHEET' | 'FORENSIC_EXAMINATION' | 'SEARCH_WARRANT' | 'CYBER_INCIDENT_REPORT' | string;
+  documentType: DocumentCategory | string;
   extractedEntities: ExtractedEntity[];
   aiSummary: string;
   keywords: string[];
   riskScore: number;
+  statutorySections: string[];
   tamperAnomalyDetected: boolean;
   analysisTimestamp: string;
+  section65BCompliant: boolean;
 }
+
+export type AIForensicAnalysis = DocumentIntelligenceAnalysis;
 
 export interface ActiveSession {
   id: string;
@@ -267,12 +365,15 @@ export interface ActiveSession {
 }
 
 export interface ForensicStats {
+  totalCases: number;
+  totalDocuments: number;
   totalEvidenceItems: number;
   integrityVerifiedPercent: number;
-  tamperAlertsCount: number;
-  activeThreats: number;
-  aiAnalysesCompleted: number;
+  legalHoldCount: number;
+  pendingReviewsCount: number;
+  activeSecurityEvents: number;
   totalAuditEvents: number;
+  sharedDocsCount: number;
 }
 
 export interface IngestionStepProgress {

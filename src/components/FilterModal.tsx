@@ -11,22 +11,35 @@ export interface FilterOptions {
 }
 
 interface FilterModalProps {
-  isOpen: boolean;
+  isOpen?: boolean;
   onClose: () => void;
   filters: FilterOptions;
-  setFilters: React.Dispatch<React.SetStateAction<FilterOptions>>;
+  setFilters?: React.Dispatch<React.SetStateAction<FilterOptions>>;
+  onApply?: (filters: FilterOptions) => void;
   onReset: () => void;
-  matchingCount: number;
+  matchingCount?: number;
 }
 
 export const FilterModal: React.FC<FilterModalProps> = ({
-  isOpen,
+  isOpen = true,
   onClose,
-  filters,
-  setFilters,
+  filters: initialFilters,
+  setFilters: setFiltersProp,
+  onApply,
   onReset,
   matchingCount,
 }) => {
+  const [localFilters, setLocalFilters] = React.useState<FilterOptions>(initialFilters);
+
+  const setFilters = (updater: any) => {
+    if (setFiltersProp) {
+      setFiltersProp(updater);
+    }
+    setLocalFilters(updater);
+  };
+
+  const filters = setFiltersProp ? initialFilters : localFilters;
+
   if (!isOpen) return null;
 
   return (
@@ -70,19 +83,19 @@ export const FilterModal: React.FC<FilterModalProps> = ({
               INVESTIGATION STATUS
             </label>
             <div className="grid grid-cols-3 gap-1.5">
-              {(['ALL', 'ACTIVE', 'PENDING REVIEW', 'UNDER TRIAL', 'RESOLVED', 'ARCHIVED'] as const).map(
+              {(['ALL', 'ACTIVE', 'UNDER_REVIEW', 'UNDER_TRIAL', 'DISPOSED', 'ARCHIVED'] as const).map(
                 (st) => (
                   <button
                     key={st}
                     type="button"
-                    onClick={() => setFilters((prev) => ({ ...prev, status: st }))}
+                    onClick={() => setFilters((prev) => ({ ...prev, status: st as any }))}
                     className={`py-1.5 px-2 rounded text-center transition-all cursor-pointer font-medium text-[11px] ${
                       filters.status === st
                         ? 'bg-zinc-900 text-white font-bold'
                         : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900'
                     }`}
                   >
-                    {st}
+                    {st.replace('_', ' ')}
                   </button>
                 )
               )}
@@ -95,13 +108,13 @@ export const FilterModal: React.FC<FilterModalProps> = ({
               SECURITY CLASSIFICATION
             </label>
             <div className="grid grid-cols-2 gap-1.5">
-              {(['ALL', 'CONFIDENTIAL', 'RESTRICTED', 'TOP SECRET'] as const).map(
+              {(['ALL', 'UNCLASSIFIED', 'INTERNAL', 'CONFIDENTIAL', 'RESTRICTED', 'HIGHLY_RESTRICTED'] as const).map(
                 (lvl) => (
                   <button
                     key={lvl}
                     type="button"
                     onClick={() =>
-                      setFilters((prev) => ({ ...prev, classification: lvl }))
+                      setFilters((prev) => ({ ...prev, classification: lvl as any }))
                     }
                     className={`py-1.5 px-2.5 rounded text-center transition-all cursor-pointer font-medium text-[11px] ${
                       filters.classification === lvl
@@ -109,7 +122,7 @@ export const FilterModal: React.FC<FilterModalProps> = ({
                         : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900'
                     }`}
                   >
-                    {lvl}
+                    {lvl.replace('_', ' ')}
                   </button>
                 )
               )}
@@ -150,7 +163,10 @@ export const FilterModal: React.FC<FilterModalProps> = ({
               MATCHES: <strong className="text-zinc-900">{matchingCount}</strong>
             </span>
             <button
-              onClick={onClose}
+              onClick={() => {
+                if (onApply) onApply(localFilters);
+                onClose();
+              }}
               className="bg-zinc-900 hover:bg-black text-white font-bold px-4 py-1.5 rounded flex items-center gap-1.5 transition-all cursor-pointer"
             >
               <Check className="w-3.5 h-3.5" />

@@ -1,528 +1,627 @@
-import { CaseItem, SecurityAlert, OfficerProfile } from '../types';
+import { CaseItem, SecurityAlert, OfficerProfile, ManagedDocument } from '../types';
 
 export const CURRENT_OFFICER: OfficerProfile = {
   id: 'IO-1042',
-  name: 'Special Agent K. Vance',
-  rank: 'Senior Digital Forensic Examiner',
+  name: 'Inspector Anil Sharma',
+  rank: 'Senior Investigating Officer',
   clearanceLevel: 4,
-  clearanceName: 'LEVEL 4 // TOP SECRET / SCI',
-  department: 'Federal Cyber Defense & Forensics Division',
+  clearanceName: 'LEVEL 4 (HIGHLY RESTRICTED)',
+  department: 'State Cyber Crime Police Station & Forensics Unit',
   activeSessionDuration: '02h 47m 18s',
-  terminalNode: 'SEC-TERM-NODE-78B',
+  terminalNode: 'CYBER-STATION-TERM-04',
   publicKey: '04:8F:72:A9:1C:45:D2:98:AF:33:41:55:06:B6:D4:F5:9E:0B:10:B9:81:42:77:99',
-  roles: ['SUPER_ADMIN', 'INVESTIGATOR', 'FORENSIC_ANALYST']
+  roles: ['ADMINISTRATOR', 'INVESTIGATING_OFFICER', 'FORENSIC_ANALYST']
 };
+
+export const INITIAL_MANAGED_DOCUMENTS: ManagedDocument[] = [
+  {
+    id: 'DOC-2026-00421-FIR',
+    caseId: 'CASE-UP-CYB-2026-00421',
+    title: 'First Information Report (FIR No. 142/2026)',
+    category: 'FIR',
+    fileExtension: '.pdf',
+    fileSize: '2.4 MB',
+    owner: 'Insp. Anil Sharma',
+    ownerRole: 'INVESTIGATING_OFFICER',
+    dateCreated: '2026-07-12 08:30:00 UTC',
+    lastModified: '2026-07-12 09:15:00 UTC',
+    classification: 'CONFIDENTIAL',
+    lifecycleStatus: 'APPROVED',
+    currentVersion: 'v1.0',
+    sha256Hash: 'C1928374AFBC0912837465019283746591823746501928374650192837465019',
+    isIntegrityVerified: true,
+    digitalSignatureStatus: 'VALID',
+    signerName: 'Station House Officer Insp. Anil Sharma',
+    signatureTimestamp: '2026-07-12 09:15:00 UTC',
+    accessClearanceRequired: 2,
+    lastAccessedBy: 'Adv. Sanjay Deshmukh (Legal Officer)',
+    lastAccessedDate: '2026-08-27 10:20:00 UTC',
+    retentionYears: 10,
+    retentionExpiryDate: '2036-07-12',
+    legalHold: true,
+    contentSummary: 'First Information Report lodged under Section 66, 66C, 66D Information Technology Act 2000 and Section 318(4) Bharatiya Nyaya Sanhita (BNS) for multi-crore unauthorized financial diversion.',
+    tags: ['FIR', 'Cognizable Offense', 'IT Act 66D', 'Financial Fraud'],
+    sharedWith: [
+      {
+        id: 'SHR-001',
+        documentId: 'DOC-2026-00421-FIR',
+        documentTitle: 'First Information Report (FIR No. 142/2026)',
+        sharedWithUserId: 'LEGAL-08',
+        sharedWithUserName: 'Adv. Sanjay Deshmukh',
+        sharedWithRole: 'LEGAL_OFFICER',
+        sharedByUserName: 'Insp. Anil Sharma',
+        permission: 'VIEW',
+        sharedAt: '2026-07-15 11:00:00 UTC',
+        expiresAt: '30 Days (2026-09-15)',
+        status: 'ACTIVE',
+        notes: 'Shared for filing remand application in Chief Judicial Magistrate Court.'
+      }
+    ],
+    versions: [
+      {
+        versionNumber: 1,
+        versionTag: 'v1.0',
+        author: 'Insp. Anil Sharma',
+        authorRole: 'INVESTIGATING_OFFICER',
+        timestamp: '2026-07-12 09:15:00 UTC',
+        changeDescription: 'Initial signed FIR upload following complainant statement recording.',
+        sha256Hash: 'C1928374AFBC0912837465019283746591823746501928374650192837465019',
+        fileSize: '2.4 MB',
+        signatureStatus: 'VALID',
+        signerName: 'Station House Officer Insp. Anil Sharma',
+        isCurrent: true
+      }
+    ],
+    metadata: {
+      fileName: 'FIR_142_2026_Cyber_Crime.pdf',
+      mimeType: 'application/pdf',
+      pageCount: 6,
+      author: 'Cyber Crime Police Station HQ',
+      additional: {
+        'Police Station': 'State Cyber Crime Police Station, Sector 18',
+        'State Police Stamp': 'VERIFIED // OFFICIAL RECORD',
+        'Court Reference': 'Chief Judicial Magistrate Court II'
+      }
+    }
+  },
+  {
+    id: 'DOC-2026-00421-REP',
+    caseId: 'CASE-UP-CYB-2026-00421',
+    title: 'Digital Forensic Incident Examination Report',
+    category: 'FORENSIC_REPORT',
+    fileExtension: '.pdf',
+    fileSize: '14.8 MB',
+    owner: 'Analyst Rahul Singh',
+    ownerRole: 'FORENSIC_ANALYST',
+    dateCreated: '2026-07-14 09:42:00 UTC',
+    lastModified: '2026-08-25 14:30:00 UTC',
+    classification: 'RESTRICTED',
+    lifecycleStatus: 'FINAL',
+    currentVersion: 'v2.1',
+    sha256Hash: '8F72A91C45D298AF72C10F826A91B82190A81234EFC0912478D8901234567890',
+    isIntegrityVerified: true,
+    digitalSignatureStatus: 'VALID',
+    signerName: 'Analyst Rahul Singh (Lead Examiner)',
+    signatureTimestamp: '2026-08-25 14:30:00 UTC',
+    accessClearanceRequired: 3,
+    lastAccessedBy: 'Insp. Anil Sharma',
+    lastAccessedDate: '2026-08-27 09:12:00 UTC',
+    retentionYears: 15,
+    retentionExpiryDate: '2041-07-14',
+    legalHold: true,
+    contentSummary: 'Comprehensive forensic bitstream analysis of seized NVMe hard drives, SIM box arrays, and transaction ledger extractions confirming unauthorized API tapping.',
+    tags: ['Forensic Report', 'NVMe Carving', 'Section 65B Certified', 'Memory Dump'],
+    sharedWith: [
+      {
+        id: 'SHR-002',
+        documentId: 'DOC-2026-00421-REP',
+        documentTitle: 'Digital Forensic Incident Examination Report',
+        sharedWithUserId: 'IO-1042',
+        sharedWithUserName: 'Insp. Anil Sharma',
+        sharedWithRole: 'INVESTIGATING_OFFICER',
+        sharedByUserName: 'Analyst Rahul Singh',
+        permission: 'EDIT',
+        sharedAt: '2026-07-14 10:00:00 UTC',
+        expiresAt: 'Permanent (Case Team)',
+        status: 'ACTIVE',
+        notes: 'Master forensic evidence for charge sheet annexure.'
+      },
+      {
+        id: 'SHR-003',
+        documentId: 'DOC-2026-00421-REP',
+        documentTitle: 'Digital Forensic Incident Examination Report',
+        sharedWithUserId: 'REV-04',
+        sharedWithUserName: 'Dr. Meenakshi Sundaram',
+        sharedWithRole: 'REVIEWER',
+        sharedByUserName: 'Analyst Rahul Singh',
+        permission: 'COMMENT',
+        sharedAt: '2026-08-20 09:00:00 UTC',
+        expiresAt: '14 Days (2026-09-03)',
+        status: 'ACTIVE',
+        notes: 'Independent peer review of digital evidence hash verification.'
+      }
+    ],
+    versions: [
+      {
+        versionNumber: 3,
+        versionTag: 'v2.1',
+        author: 'Analyst Rahul Singh',
+        authorRole: 'FORENSIC_ANALYST',
+        timestamp: '2026-08-25 14:30:00 UTC',
+        changeDescription: 'Final signed edition including Section 65B Indian Evidence Act Certificate annexure.',
+        sha256Hash: '8F72A91C45D298AF72C10F826A91B82190A81234EFC0912478D8901234567890',
+        fileSize: '14.8 MB',
+        signatureStatus: 'VALID',
+        signerName: 'Analyst Rahul Singh (Lead Examiner)',
+        isCurrent: true
+      },
+      {
+        versionNumber: 2,
+        versionTag: 'v2.0',
+        author: 'Analyst Rahul Singh',
+        authorRole: 'FORENSIC_ANALYST',
+        timestamp: '2026-08-10 11:20:00 UTC',
+        changeDescription: 'Updated with decrypted payload dumps and VoIP intercept corroboration.',
+        sha256Hash: '7E61B80D34C1879EF61B0E715B80A71089A70123DEB0801367C7890123456781',
+        fileSize: '12.4 MB',
+        signatureStatus: 'PENDING',
+        isCurrent: false
+      },
+      {
+        versionNumber: 1,
+        versionTag: 'v1.0',
+        author: 'Analyst Rahul Singh',
+        authorRole: 'FORENSIC_ANALYST',
+        timestamp: '2026-07-14 09:42:00 UTC',
+        changeDescription: 'Initial draft containing raw FTK Imager checksums and disk triage.',
+        sha256Hash: '6D50A79C23B0768DE50A0D604A70960978960012CDB0790256B6789012345670',
+        fileSize: '8.1 MB',
+        signatureStatus: 'UNSIGNED',
+        isCurrent: false
+      }
+    ]
+  },
+  {
+    id: 'DOC-2026-00421-SEZ',
+    caseId: 'CASE-UP-CYB-2026-00421',
+    title: 'Seizure Memo & Panchnama Record',
+    category: 'SEIZURE_MEMO',
+    fileExtension: '.pdf',
+    fileSize: '3.1 MB',
+    owner: 'Insp. Anil Sharma',
+    ownerRole: 'INVESTIGATING_OFFICER',
+    dateCreated: '2026-07-14 11:15:00 UTC',
+    lastModified: '2026-07-14 12:00:00 UTC',
+    classification: 'CONFIDENTIAL',
+    lifecycleStatus: 'FINAL',
+    currentVersion: 'v1.0',
+    sha256Hash: '9F86D081884C7D659A2FEAA0C55AD015A3BF4F1B2B0B822CD15D6C15B0F00A08',
+    isIntegrityVerified: true,
+    digitalSignatureStatus: 'VALID',
+    signerName: 'Insp. Anil Sharma & Independent Panchas',
+    signatureTimestamp: '2026-07-14 12:00:00 UTC',
+    accessClearanceRequired: 2,
+    lastAccessedBy: 'Insp. Anil Sharma',
+    lastAccessedDate: '2026-08-26 15:40:00 UTC',
+    retentionYears: 10,
+    retentionExpiryDate: '2036-07-14',
+    legalHold: true,
+    contentSummary: 'Panchnama executed in the presence of two independent witnesses documenting the seizure of 2TB NVMe SSD, HackRF transceiver, and 14 SIM cards with Faraday tamper-evident seals.',
+    tags: ['Seizure Memo', 'Panchnama', 'Chain of Custody', 'Hardware Evidence'],
+    sharedWith: [],
+    versions: [
+      {
+        versionNumber: 1,
+        versionTag: 'v1.0',
+        author: 'Insp. Anil Sharma',
+        authorRole: 'INVESTIGATING_OFFICER',
+        timestamp: '2026-07-14 12:00:00 UTC',
+        changeDescription: 'Executed panchnama with panch signatures and hash seals.',
+        sha256Hash: '9F86D081884C7D659A2FEAA0C55AD015A3BF4F1B2B0B822CD15D6C15B0F00A08',
+        fileSize: '3.1 MB',
+        signatureStatus: 'VALID',
+        signerName: 'Insp. Anil Sharma & Independent Panchas',
+        isCurrent: true
+      }
+    ]
+  },
+  {
+    id: 'DOC-2026-00421-WIT',
+    caseId: 'CASE-UP-CYB-2026-00421',
+    title: 'Witness Statement of Bank Systems Administrator',
+    category: 'WITNESS_STATEMENT',
+    fileExtension: '.pdf',
+    fileSize: '1.6 MB',
+    owner: 'Insp. Anil Sharma',
+    ownerRole: 'INVESTIGATING_OFFICER',
+    dateCreated: '2026-07-18 14:00:00 UTC',
+    lastModified: '2026-07-18 15:30:00 UTC',
+    classification: 'CONFIDENTIAL',
+    lifecycleStatus: 'APPROVED',
+    currentVersion: 'v1.1',
+    sha256Hash: '4B227777D4DD1FC61C6F884F48641D02B4D121D3FD328CB08B5531FCACDABF8A',
+    isIntegrityVerified: true,
+    digitalSignatureStatus: 'VALID',
+    signerName: 'Sub-Inspector Rohit Saxena',
+    signatureTimestamp: '2026-07-18 15:30:00 UTC',
+    accessClearanceRequired: 2,
+    lastAccessedBy: 'Adv. Sanjay Deshmukh',
+    lastAccessedDate: '2026-08-25 11:10:00 UTC',
+    retentionYears: 10,
+    retentionExpiryDate: '2036-07-18',
+    legalHold: true,
+    contentSummary: 'Statement of Principal Database Engineer detailing the exact timestamp when unauthorized API access tokens were generated from rogue IP subnet.',
+    tags: ['Witness Statement', 'Section 180 BNSS', 'Bank Server Logs'],
+    sharedWith: [],
+    versions: [
+      {
+        versionNumber: 2,
+        versionTag: 'v1.1',
+        author: 'Insp. Anil Sharma',
+        authorRole: 'INVESTIGATING_OFFICER',
+        timestamp: '2026-07-18 15:30:00 UTC',
+        changeDescription: 'Appended verified server IP logs and timestamp verification table.',
+        sha256Hash: '4B227777D4DD1FC61C6F884F48641D02B4D121D3FD328CB08B5531FCACDABF8A',
+        fileSize: '1.6 MB',
+        signatureStatus: 'VALID',
+        signerName: 'Sub-Inspector Rohit Saxena',
+        isCurrent: true
+      },
+      {
+        versionNumber: 1,
+        versionTag: 'v1.0',
+        author: 'Insp. Anil Sharma',
+        authorRole: 'INVESTIGATING_OFFICER',
+        timestamp: '2026-07-18 14:00:00 UTC',
+        changeDescription: 'Initial statement recorded during field examination.',
+        sha256Hash: '3A116666C3CC0EB50B5E773E37530C01A3C010C2EC217BA07A4420EBBBC9AE79',
+        fileSize: '1.2 MB',
+        signatureStatus: 'PENDING',
+        isCurrent: false
+      }
+    ]
+  },
+  {
+    id: 'DOC-2026-00421-CHG',
+    caseId: 'CASE-UP-CYB-2026-00421',
+    title: 'Final Charge Sheet under Section 193 BNSS',
+    category: 'CHARGE_SHEET',
+    fileExtension: '.pdf',
+    fileSize: '8.9 MB',
+    owner: 'Insp. Anil Sharma',
+    ownerRole: 'INVESTIGATING_OFFICER',
+    dateCreated: '2026-08-26 10:00:00 UTC',
+    lastModified: '2026-08-27 08:30:00 UTC',
+    classification: 'RESTRICTED',
+    lifecycleStatus: 'UNDER_REVIEW',
+    currentVersion: 'v1.0',
+    sha256Hash: 'EF2D127DE37B942BAAD06145E54B0C619A1F22327B2EBBCFBEC78F5564AFE39D',
+    isIntegrityVerified: true,
+    digitalSignatureStatus: 'PENDING',
+    accessClearanceRequired: 3,
+    lastAccessedBy: 'Adv. Sanjay Deshmukh (Legal Officer)',
+    lastAccessedDate: '2026-08-27 09:45:00 UTC',
+    retentionYears: 20,
+    retentionExpiryDate: '2046-08-26',
+    legalHold: true,
+    contentSummary: 'Formal charge sheet submitting 42 documentary exhibits and 18 digital forensic artifacts to Chief Judicial Magistrate Court against accused persons.',
+    tags: ['Charge Sheet', 'Court Filing', 'Section 193 BNSS', 'Trial Ready'],
+    sharedWith: [
+      {
+        id: 'SHR-004',
+        documentId: 'DOC-2026-00421-CHG',
+        documentTitle: 'Final Charge Sheet under Section 193 BNSS',
+        sharedWithUserId: 'LEGAL-08',
+        sharedWithUserName: 'Adv. Sanjay Deshmukh',
+        sharedWithRole: 'LEGAL_OFFICER',
+        sharedByUserName: 'Insp. Anil Sharma',
+        permission: 'EDIT',
+        sharedAt: '2026-08-26 10:30:00 UTC',
+        expiresAt: '7 Days (2026-09-02)',
+        status: 'ACTIVE',
+        notes: 'Under final legal scrutiny prior to court submission.'
+      }
+    ],
+    versions: [
+      {
+        versionNumber: 1,
+        versionTag: 'v1.0',
+        author: 'Insp. Anil Sharma',
+        authorRole: 'INVESTIGATING_OFFICER',
+        timestamp: '2026-08-26 10:00:00 UTC',
+        changeDescription: 'Consolidated charge sheet draft for Supervisory Review.',
+        sha256Hash: 'EF2D127DE37B942BAAD06145E54B0C619A1F22327B2EBBCFBEC78F5564AFE39D',
+        fileSize: '8.9 MB',
+        signatureStatus: 'PENDING',
+        isCurrent: true
+      }
+    ]
+  },
+  {
+    id: 'DOC-2026-00108-WAR',
+    caseId: 'CASE-MH-CYB-2026-00108',
+    title: 'Search and Electronic Seizure Warrant #SW-108/2026',
+    category: 'COURT_FILING',
+    fileExtension: '.pdf',
+    fileSize: '1.9 MB',
+    owner: 'Insp. Priya Verma',
+    ownerRole: 'INVESTIGATING_OFFICER',
+    dateCreated: '2026-05-20 10:00:00 UTC',
+    lastModified: '2026-05-20 11:30:00 UTC',
+    classification: 'CONFIDENTIAL',
+    lifecycleStatus: 'FINAL',
+    currentVersion: 'v1.0',
+    sha256Hash: 'BC94A2E3519C2989B52A12903820FA84618E47F2EF8C1308A32A688FB4FF9F92',
+    isIntegrityVerified: true,
+    digitalSignatureStatus: 'VALID',
+    signerName: 'Hon. Metropolitan Magistrate, Mumbai',
+    signatureTimestamp: '2026-05-20 11:30:00 UTC',
+    accessClearanceRequired: 2,
+    lastAccessedBy: 'Insp. Priya Verma',
+    lastAccessedDate: '2026-08-24 16:20:00 UTC',
+    retentionYears: 10,
+    retentionExpiryDate: '2036-05-20',
+    legalHold: true,
+    contentSummary: 'Judicial warrant authorizing search and recovery of encrypted flash drives and digital identity forgery apparatus.',
+    tags: ['Court Order', 'Search Warrant', 'Judicial Authorization'],
+    sharedWith: [],
+    versions: [
+      {
+        versionNumber: 1,
+        versionTag: 'v1.0',
+        author: 'Insp. Priya Verma',
+        authorRole: 'INVESTIGATING_OFFICER',
+        timestamp: '2026-05-20 11:30:00 UTC',
+        changeDescription: 'Certified copy stamped by Registrar of Sessions Court.',
+        sha256Hash: 'BC94A2E3519C2989B52A12903820FA84618E47F2EF8C1308A32A688FB4FF9F92',
+        fileSize: '1.9 MB',
+        signatureStatus: 'VALID',
+        signerName: 'Hon. Metropolitan Magistrate, Mumbai',
+        isCurrent: true
+      }
+    ]
+  }
+];
 
 export const INITIAL_CASES: CaseItem[] = [
   {
-    id: '#INV-2026-00421',
-    title: 'Operation Cipher Break: Quantum Key Exfiltration',
+    id: 'CASE-UP-CYB-2026-00421',
+    title: 'Cyber Crime Investigation: Unauthorized Financial Diversion & SIM Box Syndicate',
     status: 'ACTIVE',
     classification: 'CONFIDENTIAL',
     leadOfficer: {
       id: 'IO-1042',
-      name: 'Special Agent K. Vance',
-      rank: 'Senior Forensic Investigator',
-      department: 'Cyber Forensics Unit'
+      name: 'Inspector Anil Sharma',
+      rank: 'Senior Cyber Investigator',
+      department: 'State Cyber Crime Police Station'
     },
+    department: 'State Cyber Crime Police Station (HQ)',
+    location: 'Cyber Cell HQ, Lucknow & NCR Liaison Node',
     documentsCount: 42,
     evidenceCount: 18,
     dateInitiated: '2026-06-12',
-    lastUpdated: '2026-08-26 18:42:10 UTC',
-    summary: 'Investigation into unauthorized interception and extraction of encrypted aerospace telemetry data over satellite link 9A-Orbital.',
+    lastUpdated: '2026-08-27 10:20:00 UTC',
+    summary: 'Investigation into unauthorized API interception, bulk SIM spoofing, and automated diverting of banking escrow funds under Section 66C/66D IT Act & Section 318 BNS.',
     integrityHash: 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
     securityClearanceLevel: 2,
-    tags: ['Cyber', 'Telemetry', 'Satellite', 'Classified Comms'],
+    legalHold: true,
+    tags: ['Cyber Fraud', 'SIM Box', 'API Intercept', 'IT Act 66D', 'BNS 318'],
     suspects: [
       {
         id: 'SUS-01',
-        name: 'Dmitri Voronov',
+        name: 'Rakesh Kumar Tiwari',
         alias: 'Spectre_99',
         status: 'FUGITIVE',
         biometricMatchRate: 94.8,
-        lastKnownLocation: 'Sector 7 Port Terminal, Geneva',
-        notes: 'Suspected operator of rogue SDR relay station intercepted on 2026-07-04.'
+        lastKnownLocation: 'Transit Node near Border Checkpost',
+        notes: 'Primary operator of rogue GSM gateway transceiver seized on 2026-07-14.'
       },
       {
         id: 'SUS-02',
-        name: 'Elena Rostova',
-        alias: 'NullPointer',
+        name: 'Mohit Rawat',
+        alias: 'BitConduit',
         status: 'PERSON_OF_INTEREST',
         biometricMatchRate: 88.2,
-        lastKnownLocation: 'Zurich Financial District',
-        notes: 'Financial conduit transferring anonymized tether tokens for hardware acquisition.'
+        lastKnownLocation: 'Gautam Buddha Nagar, Noida',
+        notes: 'Financial conduit managing mule current accounts for cryptocurrency conversion.'
       }
     ],
     evidenceItems: [
       {
-        id: 'EV-421-01',
-        name: 'Samsung 990 PRO NVMe SSD (2TB)',
+        id: 'EV-2026-00421',
+        name: 'investigation_report.pdf',
+        type: 'DOC_PDF',
+        description: 'Master Digital Forensics Incident Report with seized payload dumps and packet capture analysis.',
+        collectedDate: '2026-07-14 09:42:00 UTC',
+        collectedBy: 'Insp. Anil Sharma',
+        currentCustodian: 'State Forensic Science Lab (Locker 04)',
+        locationFound: 'Cyber Cell Forensic Lab #2',
+        status: 'IN_VAULT',
+        classification: 'CONFIDENTIAL',
+        digitalHashSha256: '8F72A91C45D298AF72C10F826A91B82190A81234EFC0912478D8901234567890',
+        currentHashSha256: '8F72A91C45D298AF72C10F826A91B82190A81234EFC0912478D8901234567890',
+        digitalHashVerified: true,
+        isTampered: false,
+        encryptionStatus: 'AES-256 (At-Rest Enclave)',
+        signatureStatus: 'VALID',
+        signerName: 'Analyst Rahul Singh (Lead Examiner)',
+        storageLocker: 'VAULT-LOCKER-ALPHA-01',
+        fileSize: '14.8 MB',
+        fileExtension: '.pdf'
+      },
+      {
+        id: 'EV-2026-00422',
+        name: 'samsung_990pro_raw_image.E01',
         type: 'DIGITAL_STORAGE',
-        description: 'Physical disk recovered from clandestine server rack in Zurich sub-station. Contains raw unencrypted exfiltration logs.',
-        collectedDate: '2026-07-14',
-        collectedBy: 'IO-1042',
-        locationFound: 'Zurich Sub-Station #4, Vault Rack C',
-        status: 'IN_VAULT',
-        digitalHashSha256: '9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08',
-        digitalHashVerified: true,
-        storageLocker: 'LOCKER-CYBER-A12',
-        fileSize: '1.84 TB',
-        fileExtension: '.raw.img',
-        metadata: {
-          'File System': 'EXT4 Encrypted (Decoded)',
-          'Partitions': '3',
-          'Sector Size': '4096 bytes',
-          'Write Blocker Used': 'Tableau T8u USB 3.0 Bridge'
-        }
-      },
-      {
-        id: 'EV-421-02',
-        name: 'HackRF One SDR Transceiver & Antenna Array',
-        type: 'PHYSICAL_SAMPLE',
-        description: 'Software-defined radio module configured to tap Ku-band commercial satellite downlink channels.',
-        collectedDate: '2026-07-14',
-        collectedBy: 'IO-1042',
-        locationFound: 'Rooftop Dish Array, Zurich',
-        status: 'IN_VAULT',
-        digitalHashSha256: '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8',
-        digitalHashVerified: true,
-        storageLocker: 'VAULT-SEC-09',
-        metadata: {
-          'Frequency Range': '1MHz - 6GHz',
-          'Serial Number': 'HRF-2024-998124',
-          'Firmware Mod': 'Custom ChaosEngine v3.1'
-        }
-      },
-      {
-        id: 'EV-421-03',
-        name: 'Wiretap Audio Intercept: Comms Relay #104',
-        type: 'AUDIO_INTERCEPT',
-        description: 'Decrypted voice over VoIP conversation discussing package drop at Terminal 4.',
-        collectedDate: '2026-07-28',
-        collectedBy: 'IO-0988',
-        locationFound: 'SIP Server Node #18 (Geneva)',
+        description: 'Forensic bitstream physical disk image (Expert Witness E01 format) of seized 2TB NVMe SSD from suspect server.',
+        collectedDate: '2026-07-14 11:15:00 UTC',
+        collectedBy: 'Insp. Anil Sharma',
+        currentCustodian: 'Forensic Lab Storage Array',
+        locationFound: 'Noida Hub Server Room C',
         status: 'FORENSIC_LAB',
-        digitalHashSha256: '4b227777d4dd1fc61c6f884f48641d02b4d121d3fd328cb08b5531fcacdabf8a',
+        classification: 'RESTRICTED',
+        digitalHashSha256: '9F86D081884C7D659A2FEAA0C55AD015A3BF4F1B2B0B822CD15D6C15B0F00A08',
+        currentHashSha256: '9F86D081884C7D659A2FEAA0C55AD015A3BF4F1B2B0B822CD15D6C15B0F00A08',
         digitalHashVerified: true,
-        storageLocker: 'CLOUD-SEC-STORAGE-01',
-        fileSize: '28.4 MB',
-        fileExtension: '.flac',
-        metadata: {
-          'Duration': '04m 12s',
-          'Sample Rate': '48kHz 24-bit',
-          'Voice ID Match': 'Voronov, Dmitri (96.2%)'
-        }
-      },
-      {
-        id: 'EV-421-04',
-        name: 'Surveillance CCTV: Geneva Terminal 4 Drop Point',
-        type: 'VIDEO_SURVEILLANCE',
-        description: 'High-definition 4K footage capturing individual matching Suspect-01 carrying encrypted briefcase.',
-        collectedDate: '2026-08-01',
-        collectedBy: 'IO-1042',
-        locationFound: 'Terminal 4 Gate 12 Security Cam',
-        status: 'IN_VAULT',
-        digitalHashSha256: 'ef2d127de37b942baad06145e54b0c619a1f22327b2ebbcfbec78f5564afe39d',
-        digitalHashVerified: true,
-        storageLocker: 'CLOUD-SEC-STORAGE-02',
-        fileSize: '1.2 GB',
-        fileExtension: '.mp4',
-        metadata: {
-          'Resolution': '3840x2160 @ 60fps',
-          'Codec': 'H.265 / HEVC',
-          'Timestamp Encoded': '2026-08-01 22:14:09 UTC'
-        }
+        isTampered: false,
+        storageLocker: 'VAULT-ALPHA-HIGH-SEC',
+        fileSize: '1.84 TB',
+        fileExtension: '.E01'
       }
     ],
     chainOfCustody: [
       {
-        id: 'COC-001',
-        timestamp: '2026-07-14 14:30:00 UTC',
+        id: 'COC-421-01',
+        evidenceId: 'EV-2026-00421',
+        caseId: 'CASE-UP-CYB-2026-00421',
+        timestamp: '2026-07-14 09:42:00 UTC',
         actorId: 'IO-1042',
-        actorName: 'Special Agent K. Vance',
-        action: 'VAULT_INGESTION',
-        details: 'Seized NVMe drive cataloged, write-blocked, bitstream image generated (E01 format) and placed into Vault Locker A12.',
-        cryptographicSignature: 'SIG-RSA4096-78A90B22C1',
+        actorName: 'Insp. Anil Sharma',
+        actorRole: 'INVESTIGATING_OFFICER',
+        action: 'COLLECTED',
+        location: 'Cyber Cell Forensic Lab #2',
+        deviceIp: '10.240.12.18',
+        cryptographicSignature: '04:9A:88:C1:F2:77:81:90:E4:31:00:99:A1:B2:C3:D4:E5:F6:01:23',
+        hash: '8F72A91C45D298AF72C10F826A91B82190A81234EFC0912478D8901234567890',
+        remarks: 'Original investigative report compiled and locked with write-blocker.',
         verified: true
       },
       {
-        id: 'COC-002',
-        timestamp: '2026-07-18 09:15:00 UTC',
-        actorId: 'LAB-TECH-04',
-        actorName: 'Dr. Marcus Aris (Forensics)',
-        action: 'TRANSFER_TO_LAB',
-        details: 'Checked out drive image copy for filesystem carving and decryption analysis.',
-        cryptographicSignature: 'SIG-RSA4096-33D41E90F4',
-        verified: true
-      },
-      {
-        id: 'COC-003',
-        timestamp: '2026-08-26 11:00:00 UTC',
-        actorId: 'SYS-AUDIT',
-        actorName: 'Automated Integrity Watchdog',
-        action: 'CHAIN_VERIFICATION',
-        details: 'Routine SHA-256 integrity check completed. All 18 evidence hashes 100% matched baseline manifest.',
-        cryptographicSignature: 'SIG-ECDSA-P384-9988AF',
+        id: 'COC-421-02',
+        evidenceId: 'EV-2026-00421',
+        caseId: 'CASE-UP-CYB-2026-00421',
+        timestamp: '2026-07-14 11:15:00 UTC',
+        actorId: 'IO-205',
+        actorName: 'Officer J. Thorne (Evidence Custodian)',
+        actorRole: 'VAULT_CUSTODIAN',
+        action: 'TRANSFERRED',
+        location: 'Secure Evidence Room Node 78B',
+        deviceIp: '10.240.14.05',
+        cryptographicSignature: '04:12:34:56:78:9A:BC:DE:F0:12:34:56:78:9A:BC:DE:F0:12:34:56',
+        hash: '8F72A91C45D298AF72C10F826A91B82190A81234EFC0912478D8901234567890',
+        remarks: 'Evidence transferred to physical Vault Locker Alpha-01 with dual biometric custody handoff.',
         verified: true
       }
     ],
     documents: [
       {
-        id: 'DOC-421-W1',
-        title: 'Federal Search & Seizure Warrant #SW-2026-908',
-        category: 'SEARCH_WARRANT',
+        id: 'DOC-2026-00421-FIR',
+        title: 'First Information Report (FIR No. 142/2026)',
+        category: 'FIR_RECORD',
         dateCreated: '2026-07-12',
-        author: 'Hon. Magistrate Judge H. Thorne',
+        author: 'Insp. Anil Sharma',
         classification: 'CONFIDENTIAL',
-        contentSnippet: 'Authorizing immediate physical and electronic entry to premises at Zurich Industrial Boulevard 44 to seize computing apparatus, network storage, and transceiver equipment.',
-        pagesCount: 8,
+        contentSnippet: 'FIR registered under Section 66, 66C, 66D Information Technology Act 2000 and Section 318(4) Bharatiya Nyaya Sanhita.',
+        pagesCount: 6,
         status: 'VERIFIED',
-        caseId: '#INV-2026-00421'
-      },
-      {
-        id: 'DOC-421-R2',
-        title: 'Digital Forensic Technical Examination Report',
-        category: 'FORENSIC_ANALYSIS',
-        dateCreated: '2026-07-22',
-        author: 'Special Agent K. Vance',
-        classification: 'CONFIDENTIAL',
-        contentSnippet: 'Analysis of recovered partitions revealed 4.2 million packet captures containing unencrypted military communications stream fragments.',
-        pagesCount: 24,
-        status: 'VERIFIED',
-        caseId: '#INV-2026-00421'
+        caseId: 'CASE-UP-CYB-2026-00421'
       }
     ],
     timeline: [
       {
         id: 'TL-1',
-        date: '2026-06-12',
-        title: 'Anomaly Detected in Downlink Telemetry',
-        description: 'Satellite ground control noticed unauthorized secondary carrier wave on Ku-Band transponder 4.',
-        source: 'Orbital Ops Command'
+        date: '2026-07-12',
+        title: 'FIR Lodged & Case Registered',
+        description: 'Case registered following formal complaint from Public Sector Bank CISO.',
+        source: 'Cyber Crime Police Station'
       },
       {
         id: 'TL-2',
         date: '2026-07-14',
-        title: 'Tactical Raid & Hardware Seizure',
-        description: 'Federal agents executed warrant SW-2026-908 at Zurich facility. Secured server arrays.',
-        source: 'Field Tactical Team Alpha'
-      },
-      {
-        id: 'TL-3',
-        date: '2026-08-01',
-        title: 'Airport Intercept & Briefcase Recovery',
-        description: 'Suspect Voronov spotted at Geneva airport; abandoned secondary drive in departure lounge.',
-        source: 'Border & Customs Enforcement'
+        title: 'Search & Seizure Operation Executed',
+        description: 'Recovered 2TB NVMe SSD and 14 SIM boxes under Panchnama.',
+        source: 'Field Investigation Team'
       }
     ]
   },
   {
-    id: '#INV-2026-00422',
-    title: 'Project DarkFlow: Intercepted Defense Blueprints',
+    id: 'CASE-MH-CYB-2026-00108',
+    title: 'Document Forgery & Digital Identity Theft Taskforce',
     status: 'ACTIVE',
-    classification: 'RESTRICTED',
+    classification: 'CONFIDENTIAL',
     leadOfficer: {
       id: 'IO-0988',
-      name: 'Agent Sarah Chen',
+      name: 'Inspector Priya Verma',
       rank: 'Senior Cyber Investigator',
-      department: 'Special Investigations Bureau'
+      department: 'Special Cyber Crime Branch, Mumbai'
     },
-    documentsCount: 115,
-    evidenceCount: 4,
+    department: 'Special Cyber Crime Branch, Mumbai',
+    location: 'Bandra Kurla Complex (BKC) Cyber Cell',
+    documentsCount: 28,
+    evidenceCount: 9,
     dateInitiated: '2026-05-19',
-    lastUpdated: '2026-08-25 09:12:44 UTC',
-    summary: 'Investigation into unauthorized dissemination of composite armor manufacturing specifications and stealth drone avionics schematics.',
+    lastUpdated: '2026-08-25 11:30:00 UTC',
+    summary: 'Investigation into syndicated forgery of government identity tokens, forged digital signatures, and unauthorized Aadhaar KYC bypass scripts.',
     integrityHash: '8f434346648f6b96df89dda901c5176b10a6d83961dd3c1ac88b59b2dc327aa4',
-    securityClearanceLevel: 3,
-    tags: ['Defense', 'Industrial Espionage', 'Avionics', 'CAD Schematics'],
+    securityClearanceLevel: 2,
+    legalHold: true,
+    tags: ['Identity Theft', 'Digital Forgery', 'KYC Bypass', 'BKC Mumbai'],
     suspects: [
       {
         id: 'SUS-03',
-        name: 'Victor Sterling',
-        alias: 'Vanguard_Actual',
+        name: 'Sameer Merchant',
+        alias: 'DocMaster',
         status: 'IN_CUSTODY',
         biometricMatchRate: 99.4,
-        lastKnownLocation: 'Federal Detention Center, Unit C',
-        notes: 'Former lead materials engineer at AeroCorp Defense Systems.'
+        lastKnownLocation: 'Arthur Road Central Jail',
+        notes: 'Arrested during raid with 412 forged digital identity certificates.'
       }
     ],
-    evidenceItems: [
-      {
-        id: 'EV-422-01',
-        name: 'Micro-SD Card 512GB (Sandisk Extreme)',
-        type: 'DIGITAL_STORAGE',
-        description: 'Recovered from inside hollowed-out fountain pen during security checkpoint pat-down.',
-        collectedDate: '2026-05-20',
-        collectedBy: 'IO-0988',
-        locationFound: 'Airport Security Checkpoint 3',
-        status: 'IN_VAULT',
-        digitalHashSha256: 'bc94a2e3519c2989b52a12903820fa84618e47f2ef8c1308a32a688fb4ff9f92',
-        digitalHashVerified: true,
-        storageLocker: 'LOCKER-MINI-04',
-        fileSize: '412 GB',
-        fileExtension: '.tar.gz',
-        metadata: {
-          'File System': 'exFAT Encrypted',
-          'CAD Files Extracted': '1,420 .dwg / .step files',
-          'Classification Level': 'ITAR Restricted'
-        }
-      },
-      {
-        id: 'EV-422-02',
-        name: 'Encrypted YubiKey 5C NFC Security Key',
-        type: 'DIGITAL_STORAGE',
-        description: 'Hardware authentication token configured to unlock private Git mirror repositories.',
-        collectedDate: '2026-05-20',
-        collectedBy: 'IO-0988',
-        locationFound: 'Suspect Personal Effects',
-        status: 'IN_VAULT',
-        digitalHashSha256: '1a79a4d60de6718e8e5b326e338ae533fa85f99bf72ef83c84f47053e1b1d7d0',
-        digitalHashVerified: true,
-        storageLocker: 'VAULT-SEC-02'
-      }
-    ],
-    chainOfCustody: [
-      {
-        id: 'COC-101',
-        timestamp: '2026-05-20 18:00:00 UTC',
-        actorId: 'IO-0988',
-        actorName: 'Agent Sarah Chen',
-        action: 'VAULT_INGESTION',
-        details: 'Micro-SD card tagged, placed in Faraday tamper bag #TB-9011 and transferred to Secure Evidence Room.',
-        cryptographicSignature: 'SIG-RSA4096-44B1299C01',
-        verified: true
-      }
-    ],
-    documents: [
-      {
-        id: 'DOC-422-W1',
-        title: 'ITAR Export Violation Incident Docket',
-        category: 'COURT_ORDER',
-        dateCreated: '2026-05-21',
-        author: 'Office of the US Attorney',
-        classification: 'RESTRICTED',
-        contentSnippet: 'Formal indictment charging suspect with unauthorized export of defense articles and technical data under Title 22 United States Code § 2778.',
-        pagesCount: 32,
-        status: 'VERIFIED',
-        caseId: '#INV-2026-00422'
-      }
-    ],
-    timeline: [
-      {
-        id: 'TL-10',
-        date: '2026-05-19',
-        title: 'Internal DLP Alert Triggered',
-        description: 'Automated Data Loss Prevention system flagged mass export of 3D CAD models after hours.',
-        source: 'AeroCorp CISO'
-      }
-    ]
-  },
-  {
-    id: '#INV-2026-00418',
-    title: 'Operation Iron Vault: Sovereign Cyber Warfare Syndicate',
-    status: 'PENDING REVIEW',
-    classification: 'TOP SECRET',
-    leadOfficer: {
-      id: 'IO-1042',
-      name: 'Special Agent K. Vance',
-      rank: 'Senior Forensic Investigator',
-      department: 'Cyber Forensics Unit'
-    },
-    documentsCount: 2041,
-    evidenceCount: 88,
-    dateInitiated: '2026-01-08',
-    lastUpdated: '2026-08-27 06:15:22 UTC',
-    summary: 'Multi-jurisdictional taskforce probe investigating advanced persistent threat (APT-39) zero-day payload deployment targeting critical electrical grid SCADA controllers.',
-    integrityHash: 'a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e',
-    securityClearanceLevel: 4,
-    tags: ['APT', 'SCADA', 'Critical Infrastructure', 'Zero-Day', 'Top Secret'],
-    suspects: [
-      {
-        id: 'SUS-04',
-        name: 'Colonel Alexei Morozov',
-        alias: 'BlackOnyx',
-        status: 'FUGITIVE',
-        biometricMatchRate: 98.7,
-        lastKnownLocation: 'St. Petersburg Cyber Warfare Command',
-        notes: 'Director of specialized unit 74455 offensive cyber operations.'
-      },
-      {
-        id: 'SUS-05',
-        name: 'Yuki Takahashi',
-        alias: 'GhostProtocol',
-        status: 'PERSON_OF_INTEREST',
-        biometricMatchRate: 91.0,
-        lastKnownLocation: 'Shinjuku, Tokyo',
-        notes: 'Brokered exploit zero-day vulnerability in Siemens S7-1500 PLC firmware.'
-      }
-    ],
-    evidenceItems: [
-      {
-        id: 'EV-418-01',
-        name: 'Siemens S7-1500 PLC Mainboard with Malicious Eprom',
-        type: 'PHYSICAL_SAMPLE',
-        description: 'Infected industrial programmable logic controller recovered from sub-station transformer station 9.',
-        collectedDate: '2026-02-14',
-        collectedBy: 'IO-1042',
-        locationFound: 'Grid Sub-station Alpha-1',
-        status: 'IN_VAULT',
-        digitalHashSha256: '7d793037a0760186574b0282f2f435e7b1eef57726d441d5b843fd76cb43e455',
-        digitalHashVerified: true,
-        storageLocker: 'VAULT-ALPHA-HIGH-SEC',
-        metadata: {
-          'Manufacturer': 'Siemens Industrial Automation',
-          'Firmware Vulnerability': 'CVE-2026-9041 (Memory Corruption)',
-          'Payload Hash': 'c249a0d8e2098...'
-        }
-      },
-      {
-        id: 'EV-418-02',
-        name: 'Encrypted Cryptographic Ledger Cold Wallet (Trezor Model T)',
-        type: 'FINANCIAL_LEDGER',
-        description: 'Hardware wallet containing 4,200 Monero (XMR) utilized for zero-day exploit bounty payments.',
-        collectedDate: '2026-03-01',
-        collectedBy: 'IO-1042',
-        locationFound: 'Safe Deposit Box #882, Zurich',
-        status: 'IN_VAULT',
-        digitalHashSha256: 'e8605c3167f1396a5d4d3d3c73bb1b590e8c07e052011b984594c7b8d4c72856',
-        digitalHashVerified: true,
-        storageLocker: 'VAULT-ALPHA-HIGH-SEC',
-        metadata: {
-          'Coin Type': 'Monero (XMR)',
-          'Transaction Volume': '14 Recorded Escrow Transfers',
-          'Passphrase Status': 'Decrypted by Quantum Lab'
-        }
-      },
-      {
-        id: 'EV-418-03',
-        name: 'Satellite Reconnaissance Video: Facility 409',
-        type: 'VIDEO_SURVEILLANCE',
-        description: 'High-res synthetic aperture radar video capturing night operations at suspected command bunker.',
-        collectedDate: '2026-04-18',
-        collectedBy: 'NRO-TASKFORCE',
-        locationFound: 'Orbital Recon Grid Sat-8',
-        status: 'IN_VAULT',
-        digitalHashSha256: '3f79bb7b435b05321651daefd374cdc681dc06faa65e374e38337b88ca14539f',
-        digitalHashVerified: true,
-        storageLocker: 'VAULT-ALPHA-HIGH-SEC',
-        fileSize: '4.8 GB',
-        fileExtension: '.raw.mov'
-      }
-    ],
-    chainOfCustody: [
-      {
-        id: 'COC-201',
-        timestamp: '2026-02-14 20:00:00 UTC',
-        actorId: 'IO-1042',
-        actorName: 'Special Agent K. Vance',
-        action: 'VAULT_INGESTION',
-        details: 'Physical PLC hardware and memory chips placed into Level-4 High-Sec SCIF Vault Alpha.',
-        cryptographicSignature: 'SIG-ED25519-998811AABB',
-        verified: true
-      },
-      {
-        id: 'COC-202',
-        timestamp: '2026-08-27 05:00:00 UTC',
-        actorId: 'IO-1042',
-        actorName: 'Special Agent K. Vance',
-        action: 'CHAIN_VERIFICATION',
-        details: 'Case dossier and 88 physical evidence lockers audited for Grand Jury submission.',
-        cryptographicSignature: 'SIG-ED25519-667788CCDD',
-        verified: true
-      }
-    ],
-    documents: [
-      {
-        id: 'DOC-418-TS1',
-        title: 'National Security Directive // Presidential Findings Memo',
-        category: 'FORENSIC_ANALYSIS',
-        dateCreated: '2026-03-10',
-        author: 'Director of National Intelligence',
-        classification: 'TOP SECRET',
-        contentSnippet: 'DECLASSIFICATION PROHIBITED UNDER E.O. 13526. Detailed threat assessment on foreign adversary state-sponsored cyber warfare capabilities.',
-        pagesCount: 88,
-        status: 'SEALED',
-        caseId: '#INV-2026-00418'
-      }
-    ],
-    timeline: [
-      {
-        id: 'TL-21',
-        date: '2026-01-08',
-        title: 'Sub-station 9 Grid Spike & Relay Trip',
-        description: 'Catastrophic frequency oscillation detected at power grid junction Alpha.',
-        source: 'National Grid Control Center'
-      }
-    ]
-  },
-  {
-    id: '#INV-2026-00409',
-    title: 'Operation Ghost Courier: Darknet Narcotics Syndicate',
-    status: 'UNDER TRIAL',
-    classification: 'RESTRICTED',
-    leadOfficer: {
-      id: 'IO-0988',
-      name: 'Agent Sarah Chen',
-      rank: 'Senior Cyber Investigator',
-      department: 'Special Investigations Bureau'
-    },
-    documentsCount: 520,
-    evidenceCount: 31,
-    dateInitiated: '2025-11-04',
-    lastUpdated: '2026-08-20 14:10:00 UTC',
-    summary: 'Investigation into automated postal dispatch network distributing controlled pharmaceutical substances ordered via Tor hidden services.',
-    integrityHash: 'c4ca4238a0b923820dcc509a6f75849b29e0186716035129994c6f3764d85202',
-    securityClearanceLevel: 2,
-    tags: ['Darknet', 'Narcotics', 'Tor', 'Cryptocurrency'],
-    suspects: [
-      {
-        id: 'SUS-06',
-        name: 'Julian Hayes',
-        alias: 'Dr_Pharma',
-        status: 'IN_CUSTODY',
-        biometricMatchRate: 99.9,
-        lastKnownLocation: 'Metropolitan Detention Center',
-        notes: 'Arrested during raid on automated sorting facility.'
-      }
-    ],
-    evidenceItems: [
-      {
-        id: 'EV-409-01',
-        name: 'PGP Private Key Ring & Passphrase Keyring',
-        type: 'DIGITAL_STORAGE',
-        description: 'Decrypted 4096-bit RSA master key used to sign marketplace communications.',
-        collectedDate: '2025-11-20',
-        collectedBy: 'IO-0988',
-        locationFound: 'Server Room #2',
-        status: 'COURT_EVIDENCE',
-        digitalHashSha256: '9b71d224bd62f3785d96d46ad3ea3d73319bfbc2890caadae2dff72519673ca72',
-        digitalHashVerified: true,
-        storageLocker: 'VAULT-SEC-05'
-      }
-    ],
+    evidenceItems: [],
     chainOfCustody: [],
     documents: [],
     timeline: []
   },
   {
-    id: '#INV-2026-00395',
-    title: 'Financial Crime Case: Offshore Shell Banking Laundering',
-    status: 'RESOLVED',
-    classification: 'CONFIDENTIAL',
+    id: 'CASE-KA-CYB-2026-00342',
+    title: 'Financial Phishing & Healthcare Ransomware Extortion',
+    status: 'UNDER_INVESTIGATION',
+    classification: 'RESTRICTED',
     leadOfficer: {
       id: 'IO-1042',
-      name: 'Special Agent K. Vance',
-      rank: 'Senior Forensic Investigator',
-      department: 'Cyber Forensics Unit'
+      name: 'Inspector Anil Sharma',
+      rank: 'Senior Cyber Investigator',
+      department: 'State Cyber Crime Police Station'
     },
-    documentsCount: 940,
+    department: 'Cyber Crime Police Station, Bengaluru',
+    location: 'CID Headquarters, Bengaluru',
+    documentsCount: 65,
+    evidenceCount: 12,
+    dateInitiated: '2026-03-08',
+    lastUpdated: '2026-08-26 14:15:00 UTC',
+    summary: 'Ransomware deployment targeting hospital electronic health records database, demanding cryptocurrency ransom under threat of patient data leak.',
+    integrityHash: 'a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e',
+    securityClearanceLevel: 3,
+    legalHold: true,
+    tags: ['Ransomware', 'Healthcare Data', 'Extortion', 'Crypto Tracing'],
+    suspects: [],
+    evidenceItems: [],
+    chainOfCustody: [],
+    documents: [],
+    timeline: []
+  },
+  {
+    id: 'CASE-DL-CYB-2026-00215',
+    title: 'Stock Manipulation & Market Wiretap Investigation',
+    status: 'CHARGE_SHEETED',
+    classification: 'CONFIDENTIAL',
+    leadOfficer: {
+      id: 'IO-0988',
+      name: 'Inspector Priya Verma',
+      rank: 'Senior Cyber Investigator',
+      department: 'Special Cyber Crime Branch'
+    },
+    department: 'Special Cell Cyber Wing, New Delhi',
+    location: 'Lodhi Road Special Cell HQ',
+    documentsCount: 52,
     evidenceCount: 14,
-    dateInitiated: '2025-08-11',
-    lastUpdated: '2026-06-15 16:30:00 UTC',
-    summary: 'Completed prosecution of multi-tiered money laundering funnel through bogus maritime leasing corporations.',
-    integrityHash: 'eccbc87e4b5ce2fe28308fd9f2a7baf3a41b2c4516fc415951d38fc5500e3f16',
-    securityClearanceLevel: 1,
-    tags: ['Financial', 'Shell Corporations', 'Maritime', 'Asset Forfeiture'],
+    dateInitiated: '2025-11-14',
+    lastUpdated: '2026-08-20 16:10:00 UTC',
+    summary: 'Completed charge sheet against algorithmic trading manipulation syndicate utilizing unauthorized ultra-low latency co-location wiretap.',
+    integrityHash: 'c4ca4238a0b923820dcc509a6f75849b29e0186716035129994c6f3764d85202',
+    securityClearanceLevel: 2,
+    legalHold: false,
+    tags: ['Stock Fraud', 'Algorithmic Trading', 'SEBI Corroboration', 'Charge Sheeted'],
     suspects: [],
     evidenceItems: [],
     chainOfCustody: [],
@@ -535,40 +634,30 @@ export const INITIAL_ALERTS: SecurityAlert[] = [
   {
     id: 'ALT-9042',
     timestamp: '2026-08-27 07:18:22 UTC',
-    level: 'CRITICAL',
-    title: 'Unauthorized Vault Locker Access Attempt',
-    source: 'Hardware Vault SCIF Alpha (Locker #18)',
-    description: 'Biometric badge rejected 3 consecutive times on Physical Evidence Locker #18 (Case #INV-2026-00418). Automatic lockdown engaged.',
+    level: 'HIGH',
+    title: 'Clearance Mismatch on Classified Document Download',
+    source: 'Access Control Matrix',
+    description: 'User AN-0419 attempted to download Level 3 Restricted Document DOC-2026-00421-REP without supervisor clearance.',
     acknowledged: false,
-    relatedCaseId: '#INV-2026-00418'
+    relatedCaseId: 'CASE-UP-CYB-2026-00421'
   },
   {
     id: 'ALT-9041',
     timestamp: '2026-08-27 06:45:10 UTC',
-    level: 'HIGH',
-    title: 'Subpoena Expiration Warning',
-    source: 'Magistrate Court Automated Registry',
-    description: 'Federal electronic surveillance order for IP subnet 185.220.101.0/24 expires in 48 hours. File extension request immediately.',
+    level: 'MEDIUM',
+    title: 'Shared Document Access Token Expiring Soon',
+    source: 'Secure Collaboration Daemon',
+    description: 'Sharing permission for DOC-2026-00421-CHG with Adv. Sanjay Deshmukh expires in 5 days.',
     acknowledged: false,
-    relatedCaseId: '#INV-2026-00421'
+    relatedCaseId: 'CASE-UP-CYB-2026-00421'
   },
   {
     id: 'ALT-9039',
     timestamp: '2026-08-27 04:30:00 UTC',
     level: 'INFO',
-    title: 'Scheduled Cryptographic Hash Audit Complete',
+    title: 'Scheduled SHA-256 Integrity Verification Audit Complete',
     source: 'Automated Integrity Daemon',
-    description: '2,752 digital forensic files audited across 5 active vaults. 100% hash consistency verified with zero tampering detected.',
+    description: '2,752 digital forensic documents audited across active cases. 100% hash consistency verified with zero tampering detected.',
     acknowledged: true
-  },
-  {
-    id: 'ALT-9038',
-    timestamp: '2026-08-26 23:14:02 UTC',
-    level: 'MEDIUM',
-    title: 'Classification Clearance Elevation Logged',
-    source: 'IAM Security Gateway',
-    description: 'Agent IO-0988 granted temporary compartmented read access to Case #INV-2026-00422 for trial preparation.',
-    acknowledged: true,
-    relatedCaseId: '#INV-2026-00422'
   }
 ];
