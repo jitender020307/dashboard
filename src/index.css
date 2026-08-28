@@ -1,0 +1,299 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --font-inter: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+
+  body {
+    background-color: #f8fafc;
+    color: #0f172a;
+    font-family: var(--font-inter);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+.font-technical, .font-mono-tech {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.font-sans-main {
+  font-family: 'Inter', sans-serif;
+}
+
+/* Minimal Crisp Light Panels */
+.glass-panel {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+}
+
+.glass-panel-high-sec {
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+/* Minimal Clean Shadows */
+.glow-effect {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.glow-effect-btn:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+/* Clean Minimal Scrollbars */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Subtle light grid pattern */
+.scanline-bg {
+  background-image: linear-gradient(rgba(15, 23, 42, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15, 23, 42, 0.02) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* =========================================================================
+   PREMIUM GRAPHITE / SILVER INTERACTIVE LIGHTING SYSTEM
+   - Layer 1: Ambient soft grey/silver radial spotlight
+   - Layer 2: Core focus highlight with graphite tonal backing
+   - Layer 3: Silver perimeter edge illumination
+   - Layer 4: Floating depth elevation & layered soft shadow
+   - Layer 5: White icon contrast enhancement with soft backdrop illumination
+   ========================================================================= */
+
+.interactive-glow,
+.interactive-glow-card,
+.interactive-glow-subtle {
+  position: relative;
+  isolation: isolate;
+  --mouse-x: 50%;
+  --mouse-y: 50%;
+  --proximity: 0;
+  --is-hovered: 0;
+  transition: transform 280ms cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 280ms cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 280ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Layer 4: Soft 3D Elevation & Floating Depth Shadow */
+@media (hover: hover) and (pointer: fine) {
+  .interactive-glow:hover,
+  .interactive-glow-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 
+      0 1px 2px rgba(15, 23, 42, 0.04),
+      0 8px 24px -2px rgba(15, 23, 42, 0.09),
+      0 16px 36px -4px rgba(100, 116, 139, 0.08),
+      0 0 24px rgba(180, 190, 200, 0.10);
+  }
+
+  .interactive-glow-subtle:hover {
+    transform: translateY(-1px);
+    box-shadow: 
+      0 1px 2px rgba(15, 23, 42, 0.03),
+      0 6px 18px -1px rgba(15, 23, 42, 0.06),
+      0 0 16px rgba(180, 190, 200, 0.08);
+  }
+}
+
+/* Layer 1 & 2: Surface Ambient Spotlight & Core Focus Highlight */
+.interactive-glow::before,
+.interactive-glow-card::before,
+.interactive-glow-subtle::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 1;
+  /* Opacity scales with proximity as the cursor approaches and hovers */
+  opacity: calc(var(--proximity, 0) * 0.85 + var(--is-hovered, 0) * 0.15);
+  transition: opacity 220ms ease-out;
+  background: 
+    /* Layer 2: Core Focus Highlight (Brighter graphite/silver region) */
+    radial-gradient(
+      180px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+      rgba(215, 222, 230, 0.24) 0%,
+      rgba(175, 185, 195, 0.14) 28%,
+      transparent 65%
+    ),
+    /* Layer 1: Ambient Soft Grey/Silver Radial Glow */
+    radial-gradient(
+      440px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+      rgba(195, 205, 215, 0.16) 0%,
+      rgba(150, 160, 172, 0.08) 32%,
+      rgba(100, 112, 125, 0.03) 55%,
+      transparent 78%
+    );
+}
+
+/* Layer 3: Silver Perimeter Edge Illumination Near Cursor */
+.interactive-glow::after,
+.interactive-glow-card::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  pointer-events: none;
+  z-index: 2;
+  opacity: calc(var(--proximity, 0) * 0.8 + var(--is-hovered, 0) * 0.2);
+  transition: opacity 220ms ease-out;
+  background: radial-gradient(
+    240px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(210, 220, 230, 0.65) 0%,
+    rgba(160, 175, 190, 0.35) 30%,
+    rgba(120, 135, 150, 0.12) 55%,
+    transparent 75%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+}
+
+/* Layer 5: WHITE ICON CONTRAST ENHANCEMENT & GRAPHITE/SILVER BACKDROP
+   Creates a subtle graphite/silver illuminated backdrop behind white icons,
+   making them immediately pop with high contrast and crisp definition. */
+.interactive-glow svg,
+.interactive-glow-card svg,
+.interactive-glow-subtle svg,
+.icon-enhanced svg {
+  transition: transform 250ms cubic-bezier(0.16, 1, 0.3, 1),
+              filter 250ms cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 250ms ease-out;
+}
+
+/* When interactive component is approached or hovered, enhance white icons */
+.interactive-glow:hover svg.text-white,
+.interactive-glow:hover [class*="text-white"] svg,
+.interactive-glow:hover .text-white,
+.interactive-glow[data-hovered="true"] svg.text-white,
+.interactive-glow-card:hover svg.text-white,
+.case-card:hover svg.text-white,
+button.bg-slate-900:hover svg,
+button.bg-sky-600:hover svg,
+button.bg-emerald-600:hover svg {
+  filter: drop-shadow(0 0 7px rgba(255, 255, 255, 0.35)) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.4));
+  transform: translateY(-0.5px);
+}
+
+/* Soft graphite/silver illuminated badge container for dark/white icon chips */
+.icon-badge-dark {
+  background-color: #0f172a;
+  box-shadow: 
+    inset 0 1px 1px rgba(255, 255, 255, 0.2),
+    0 1px 3px rgba(0, 0, 0, 0.2);
+  transition: background-color 250ms ease, box-shadow 250ms ease, transform 250ms ease;
+}
+
+.interactive-glow:hover .icon-badge-dark,
+.interactive-glow-card:hover .icon-badge-dark {
+  background-color: #1e293b;
+  box-shadow: 
+    inset 0 1px 1px rgba(255, 255, 255, 0.3),
+    0 0 14px rgba(180, 195, 210, 0.22),
+    0 2px 6px rgba(0, 0, 0, 0.25);
+}
+
+/* Color Variant Tunings */
+.interactive-glow-graphite::before {
+  background: 
+    radial-gradient(
+      180px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+      rgba(200, 208, 216, 0.26) 0%,
+      rgba(150, 160, 172, 0.14) 28%,
+      transparent 65%
+    ),
+    radial-gradient(
+      440px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+      rgba(180, 190, 202, 0.18) 0%,
+      rgba(130, 142, 155, 0.08) 32%,
+      transparent 75%
+    );
+}
+
+.interactive-glow-sky::before {
+  background: 
+    radial-gradient(
+      180px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+      rgba(186, 230, 253, 0.22) 0%,
+      rgba(125, 211, 252, 0.12) 28%,
+      transparent 65%
+    ),
+    radial-gradient(
+      440px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+      rgba(2, 132, 199, 0.10) 0%,
+      rgba(14, 165, 233, 0.04) 32%,
+      transparent 75%
+    );
+}
+
+.interactive-glow-amber::before {
+  background: 
+    radial-gradient(
+      180px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+      rgba(253, 230, 138, 0.22) 0%,
+      rgba(252, 211, 77, 0.12) 28%,
+      transparent 65%
+    ),
+    radial-gradient(
+      440px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+      rgba(245, 158, 11, 0.10) 0%,
+      rgba(251, 191, 36, 0.04) 32%,
+      transparent 75%
+    );
+}
+
+.interactive-glow-emerald::before {
+  background: 
+    radial-gradient(
+      180px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+      rgba(167, 243, 208, 0.22) 0%,
+      rgba(110, 231, 183, 0.12) 28%,
+      transparent 65%
+    ),
+    radial-gradient(
+      440px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+      rgba(16, 185, 129, 0.10) 0%,
+      rgba(52, 211, 153, 0.04) 32%,
+      transparent 75%
+    );
+}
+
+/* Accessibility: Respect Reduced Motion and Touch Devices */
+@media (prefers-reduced-motion: reduce) {
+  .interactive-glow,
+  .interactive-glow-card,
+  .interactive-glow-subtle {
+    transition: none !important;
+    transform: none !important;
+  }
+  .interactive-glow::before,
+  .interactive-glow::after {
+    display: none !important;
+  }
+}
+
+@media (hover: none) {
+  .interactive-glow::before,
+  .interactive-glow::after {
+    display: none !important;
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "name": "Remix Remix Remix Remix SIH2026",
+  "description": "Classified digital evidence and case management system with chain-of-custody tracking, forensic analysis, and security clearance controls.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
