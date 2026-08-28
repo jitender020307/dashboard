@@ -10,7 +10,6 @@ import {
   KeyRound,
   Send,
   Info,
-  ArrowRight,
   ShieldCheck,
   Calendar,
   X

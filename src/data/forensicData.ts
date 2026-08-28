@@ -1,27 +1,11 @@
 import {
-  CaseItem,
   EvidenceItem,
   AuditEvent,
   SecurityThreat,
-  SecurityAlert,
-  OfficerProfile,
   AIForensicAnalysis,
   CustodyEvent,
-  CaseDocument
+  ActiveSession
 } from '../types';
-
-export const CURRENT_OFFICER: OfficerProfile = {
-  id: 'IO-1042',
-  name: 'Special Agent K. Vance',
-  rank: 'Lead Cyber Forensics Examiner',
-  clearanceLevel: 4,
-  clearanceName: 'LEVEL 4 // TOP SECRET / SCI',
-  department: 'Federal Digital Forensics & Cyber Defense Cell (SIH-26190)',
-  activeSessionDuration: '03h 12m 45s',
-  terminalNode: 'SCIF-TERMINAL-NODE-78B',
-  publicKey: '04:8F:72:A9:1C:45:D2:98:AF:72:C1:0F:82:6A:91:B8:21:44:E1:90',
-  roles: ['INVESTIGATOR', 'FORENSIC_EXAMINER', 'CUSTODIAN_AUTHORIZED']
-};
 
 export const INITIAL_EVIDENCE_ITEMS: EvidenceItem[] = [
   {
@@ -268,7 +252,7 @@ export const INITIAL_EVIDENCE_ITEMS: EvidenceItem[] = [
   }
 ];
 
-export const INITIAL_CHAIN_OF_CUSTODY: CustodyEvent[] = [
+export const INITIAL_CUSTODY_EVENTS: CustodyEvent[] = [
   {
     id: 'COC-421-01',
     evidenceId: 'EV-2026-00421',
@@ -335,7 +319,7 @@ export const INITIAL_CHAIN_OF_CUSTODY: CustodyEvent[] = [
   }
 ];
 
-export const INITIAL_AUDIT_TRAIL: AuditEvent[] = [
+export const INITIAL_AUDIT_EVENTS: AuditEvent[] = [
   {
     id: 'AUD-2026-0091',
     timestamp: '19:35:01 UTC',
@@ -534,7 +518,7 @@ export const INITIAL_THREATS: SecurityThreat[] = [
   }
 ];
 
-export const INITIAL_AI_FORENSICS: Record<string, AIForensicAnalysis> = {
+export const INITIAL_AI_ANALYSES: Record<string, AIForensicAnalysis> = {
   'EV-2026-00421': {
     documentId: 'EV-2026-00421',
     documentName: 'investigation_report.pdf',
@@ -654,9 +638,4 @@ export const INITIAL_FORENSIC_STATS = {
   aiAnalysesCompleted: 2,
   totalAuditEvents: 24,
 };
-
-// Aliases for unified importing across views
-export const INITIAL_CUSTODY_EVENTS = INITIAL_CHAIN_OF_CUSTODY;
-export const INITIAL_AUDIT_EVENTS = INITIAL_AUDIT_TRAIL;
-export const INITIAL_AI_ANALYSES = INITIAL_AI_FORENSICS;
 

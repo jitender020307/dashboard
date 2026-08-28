@@ -18,11 +18,9 @@ import {
   Terminal,
   ChevronDown,
   ChevronRight,
-  Sliders,
   HelpCircle
 } from 'lucide-react';
 import { OfficerProfile } from '../types';
-import { SpotlightBox } from './InteractiveSpotlight';
 
 export type AppTab =
   | 'dashboard'
@@ -225,7 +223,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
 
           {/* User Profile Bar */}
-          <SpotlightBox
+          <div
             onClick={() => {
               onOpenProfile();
               onCloseMobile?.();
@@ -246,7 +244,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </div>
             </div>
             <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" title="Online & Authorized" />
-          </SpotlightBox>
+          </div>
 
           {/* Navigation Section */}
           <div className="px-3 py-3 space-y-4 flex-1 overflow-y-auto">
@@ -262,8 +260,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   const isActive = activeTab === item.id;
 
                   return (
-                    <SpotlightBox
-                      as="button"
+                    <button
                       key={item.id}
                       onClick={() => {
                         setActiveTab(item.id);
@@ -306,7 +303,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                           {item.badge}
                         </span>
                       )}
-                    </SpotlightBox>
+                    </button>
                   );
                 })}
               </nav>
@@ -333,8 +330,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     const isActive = activeTab === item.id;
 
                     return (
-                      <SpotlightBox
-                        as="button"
+                      <button
                         key={item.id}
                         onClick={() => {
                           setActiveTab(item.id);
@@ -366,7 +362,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                             {item.badge}
                           </span>
                         )}
-                      </SpotlightBox>
+                      </button>
                     );
                   })}
                 </nav>
@@ -378,8 +374,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {/* Bottom Bar: CLI Terminal & Quick Help */}
         <div className="border-t border-slate-200 flex flex-col shrink-0 bg-slate-50/80">
           <div className="p-2.5 flex items-center gap-2">
-            <SpotlightBox
-              as="button"
+            <button
               onClick={onToggleTerminal}
               title="Open Forensics Terminal (CLI)"
               className="flex-1 py-1.5 px-2 bg-white hover:bg-slate-100 border border-slate-200 rounded-lg text-[11px] font-medium text-slate-700 flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
@@ -388,17 +383,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <Terminal className="w-3.5 h-3.5 text-slate-500" />
                 <span>Terminal CLI</span>
               </div>
-            </SpotlightBox>
+            </button>
 
             {onOpenGuide && (
-              <SpotlightBox
-                as="button"
+              <button
                 onClick={onOpenGuide}
                 title="Quick Guide & FAQ"
                 className="p-1.5 bg-white hover:bg-slate-100 border border-slate-200 rounded-lg text-slate-600 transition-colors cursor-pointer"
               >
                 <HelpCircle className="w-4 h-4" />
-              </SpotlightBox>
+              </button>
             )}
           </div>
 

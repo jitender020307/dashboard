@@ -4,8 +4,7 @@ import {
   User,
   Shield,
   Key,
-  Lock,
-  CheckCircle2
+  Lock
 } from 'lucide-react';
 import { OfficerProfile } from '../types';
 

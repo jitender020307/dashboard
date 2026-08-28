@@ -5,20 +5,14 @@ import {
   Database,
   Lock,
   Zap,
-  Activity,
   AlertTriangle,
   Fingerprint,
   Sparkles,
   UploadCloud,
-  Terminal,
   Radio,
-  Layers,
   ArrowRight,
   FolderKanban,
   CheckCircle2,
-  FileText,
-  GitCommit,
-  HelpCircle,
   X,
   Plus
 } from 'lucide-react';
@@ -35,7 +29,6 @@ import {
   CartesianGrid
 } from 'recharts';
 import { EvidenceItem, AuditEvent, SecurityThreat, ForensicStats } from '../types';
-import { SpotlightBox } from './InteractiveSpotlight';
 
 interface CyberForensicsDashboardProps {
   stats: ForensicStats;
@@ -45,7 +38,6 @@ interface CyberForensicsDashboardProps {
   onOpenIngestion: () => void;
   onNavigate: (tab: string) => void;
   onSelectEvidenceForIntegrity: (id: string) => void;
-  onSimulateTamper: (id: string) => void;
   onToggleTerminal: () => void;
   onNewCase?: () => void;
 }
@@ -73,7 +65,6 @@ export const CyberForensicsDashboard: React.FC<CyberForensicsDashboardProps> = (
   onOpenIngestion,
   onNavigate,
   onSelectEvidenceForIntegrity,
-  onSimulateTamper,
   onToggleTerminal,
   onNewCase,
 }) => {
@@ -218,7 +209,7 @@ export const CyberForensicsDashboard: React.FC<CyberForensicsDashboardProps> = (
       {/* 4 Clean Primary Metric Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Metric 1: Total Evidence */}
-        <SpotlightBox
+        <div
           onClick={() => onNavigate('vault')}
           className="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200 hover:border-sky-300 hover:shadow-sm transition-all cursor-pointer space-y-2 group"
         >
@@ -235,10 +226,10 @@ export const CyberForensicsDashboard: React.FC<CyberForensicsDashboardProps> = (
             <span>In Secure Vault</span>
             <ArrowRight className="w-3 h-3 text-slate-400 group-hover:translate-x-0.5 transition-transform" />
           </div>
-        </SpotlightBox>
+        </div>
 
         {/* Metric 2: Integrity Verified */}
-        <SpotlightBox
+        <div
           onClick={() => onNavigate('integrity')}
           className="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200 hover:border-sky-300 hover:shadow-sm transition-all cursor-pointer space-y-2 group"
         >
@@ -254,10 +245,10 @@ export const CyberForensicsDashboard: React.FC<CyberForensicsDashboardProps> = (
           <div className="text-xs text-emerald-700 font-medium">
             {stats.tamperAlertsCount === 0 ? 'All Hashes Match' : `${stats.tamperAlertsCount} Hash Mismatch`}
           </div>
-        </SpotlightBox>
+        </div>
 
         {/* Metric 3: Active Legal Cases */}
-        <SpotlightBox
+        <div
           onClick={() => onNavigate('cases')}
           className="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200 hover:border-sky-300 hover:shadow-sm transition-all cursor-pointer space-y-2 group"
         >
@@ -274,10 +265,10 @@ export const CyberForensicsDashboard: React.FC<CyberForensicsDashboardProps> = (
             <span>View All Cases</span>
             <ArrowRight className="w-3 h-3 text-slate-400 group-hover:translate-x-0.5 transition-transform" />
           </div>
-        </SpotlightBox>
+        </div>
 
         {/* Metric 4: Security Status */}
-        <SpotlightBox
+        <div
           onClick={() => onNavigate('threats')}
           className={`p-4 sm:p-5 rounded-2xl border hover:shadow-sm transition-all cursor-pointer space-y-2 group ${
             stats.activeThreats > 0 ? 'bg-amber-50/50 border-amber-200' : 'bg-white border-slate-200 hover:border-sky-300'
@@ -295,7 +286,7 @@ export const CyberForensicsDashboard: React.FC<CyberForensicsDashboardProps> = (
           <div className="text-xs text-slate-500 font-medium">
             AES-256 Protected
           </div>
-        </SpotlightBox>
+        </div>
       </div>
 
       {/* Case Distribution Chart + Security Levels */}
@@ -454,18 +445,13 @@ export const CyberForensicsDashboard: React.FC<CyberForensicsDashboardProps> = (
                     >
                       Verify Hash
                     </button>
-                    {!isTampered ? (
-                      <button
-                        onClick={() => onSimulateTamper(ev.id)}
-                        title="Simulate Tamper Test"
-                        className="px-2.5 py-1.5 rounded-lg bg-white hover:bg-rose-50 text-rose-700 text-xs font-medium border border-rose-200 transition-colors flex items-center gap-1 cursor-pointer shadow-2xs"
-                      >
-                        <Zap className="w-3 h-3 text-amber-600" />
-                        <span>Tamper Test</span>
-                      </button>
-                    ) : (
+                    {isTampered ? (
                       <span className="px-2.5 py-1 rounded-full bg-rose-100 text-rose-700 text-xs font-bold border border-rose-200">
                         Modified
+                      </span>
+                    ) : (
+                      <span className="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-medium border border-emerald-200">
+                        Verified
                       </span>
                     )}
                   </div>

@@ -6,15 +6,10 @@ import {
   Search,
   FolderKanban,
   X,
-  Lock,
-  Radio,
-  SlidersHorizontal,
   Terminal,
   ShieldAlert,
   CheckCircle2,
-  AlertTriangle,
-  Zap,
-  RotateCcw
+  AlertTriangle
 } from 'lucide-react';
 import {
   CaseItem,
@@ -26,8 +21,7 @@ import {
   SecurityThreat,
   AIForensicAnalysis,
   ActiveSession,
-  ForensicStats,
-  ClassificationLevel
+  ForensicStats
 } from './types';
 import { INITIAL_CASES, INITIAL_ALERTS, CURRENT_OFFICER } from './data/mockData';
 import {
@@ -45,7 +39,6 @@ import { CaseCard } from './components/CaseCard';
 import { CaseDetailModal } from './components/CaseDetailModal';
 import { FilterModal, FilterOptions } from './components/FilterModal';
 import { NewCaseModal } from './components/NewCaseModal';
-import { DashboardView } from './components/DashboardView';
 import { DocumentsView } from './components/DocumentsView';
 import { AlertsView } from './components/AlertsView';
 import { UserProfileModal, LockScreen } from './components/UserProfileModal';
@@ -63,7 +56,6 @@ import { AccessControlView } from './components/AccessControlView';
 import { ArtifactIngestionModal } from './components/ArtifactIngestionModal';
 import { MetadataForensicsModal } from './components/MetadataForensicsModal';
 import { HackerTerminal } from './components/HackerTerminal';
-import { GlobalSpotlightProvider } from './components/InteractiveSpotlight';
 
 export default function App() {
   // Navigation
@@ -244,61 +236,7 @@ export default function App() {
     }
   };
 
-  // 2. Simulate Tampering (SIH Demo Mode)
-  const handleSimulateTamper = (id: string) => {
-    const alteredHash = 'E99A77F21884B0298BEE98F1100C4D9A019842F8091E23CD495109BC8811AC92';
-    
-    setEvidenceItems((prev) =>
-      prev.map((item) => {
-        if (item.id === id) {
-          return {
-            ...item,
-            currentHashSha256: alteredHash,
-            isTampered: true,
-            digitalHashVerified: false,
-          };
-        }
-        return item;
-      })
-    );
-
-    const target = evidenceItems.find((e) => e.id === id);
-    const now = new Date().toISOString().replace('T', ' ').slice(0, 19) + ' UTC';
-
-    const newAudit: AuditEvent = {
-      id: `AUD-${Date.now().toString().slice(-4)}`,
-      timestamp: now,
-      user: 'SIMULATED_ADVERSARY (DEMO)',
-      role: 'UNAUTHORIZED_INTRUDER',
-      action: 'HASH_MISMATCH',
-      severity: 'CRITICAL',
-      result: 'ALERT',
-      caseId: target?.caseId,
-      evidenceId: target?.id,
-      ip: '198.51.100.42',
-      device: 'Rogue External Terminal',
-      details: `UNAUTHORIZED BITSTREAM ALTERATION DETECTED on ${target?.name}. Immediate containment triggered.`
-    };
-    setAuditEvents((prev) => [newAudit, ...prev]);
-
-    // Also trigger SOC Threat
-    const newThreat: SecurityThreat = {
-      id: `THR-2026-${Date.now().toString().slice(-3)}`,
-      timestamp: now,
-      severity: 'CRITICAL',
-      title: `Hash Mismatch & Unauthorized Mutation on ${target?.id}`,
-      description: `Bitstream checksum discrepancy detected on immutable vault locker. Potential forensic tampering underway.`,
-      sourceIp: '198.51.100.42 (Rogue Tor Exit Node)',
-      targetResource: `Locker Alpha / ${target?.name}`,
-      status: 'ACTIVE',
-      vector: 'Direct Inode Manipulation / Unauthorized Write Attempt',
-    };
-    setThreats((prev) => [newThreat, ...prev]);
-
-    showToast('ALERT', 'CRITICAL TAMPERING DETECTED', `Simulated byte corruption in ${target?.name}. Security containment locked!`);
-  };
-
-  // 3. Restore Evidence
+  // 2. Restore Evidence
   const handleRestoreEvidence = (id: string) => {
     setEvidenceItems((prev) =>
       prev.map((item) => {
@@ -416,41 +354,7 @@ export default function App() {
     showToast('SUCCESS', 'THREAT MITIGATED', `Quarantine rule applied to threat vector ${id}`);
   };
 
-  // 7. Trigger Simulated Intrusion Probe (Demo)
-  const handleSimulateNewThreat = () => {
-    const now = new Date().toISOString().replace('T', ' ').slice(0, 19) + ' UTC';
-    const fakeIp = `185.220.101.${Math.floor(10 + Math.random() * 80)}`;
-
-    const newThreat: SecurityThreat = {
-      id: `THR-2026-${Date.now().toString().slice(-3)}`,
-      timestamp: now,
-      severity: 'HIGH',
-      title: 'Credential Stuffing & Lateral Probe Detected',
-      description: 'Multiple automated token authentication failures originating from an unapproved offshore subnet targeting Case Docket archives.',
-      sourceIp: fakeIp,
-      targetResource: 'Vault Gateway API /api/v1/evidence/download',
-      status: 'ACTIVE',
-      vector: 'Distributed HTTP Request Flooding & Expired Token Replay',
-    };
-    setThreats((prev) => [newThreat, ...prev]);
-
-    const newAudit: AuditEvent = {
-      id: `AUD-${Date.now().toString().slice(-4)}`,
-      timestamp: now,
-      user: 'ANONYMOUS_PROBE',
-      role: 'EXTERNAL',
-      action: 'ACCESS_DENIED',
-      severity: 'WARNING',
-      result: 'DENIED',
-      ip: fakeIp,
-      device: 'Automated Exploit Scanner',
-      details: 'Zero Trust Gateway rejected unauthenticated handshake request.'
-    };
-    setAuditEvents((prev) => [newAudit, ...prev]);
-    showToast('ALERT', 'SOC THREAT TRIGGERED', `High severity intrusion attempt logged from ${fakeIp}`);
-  };
-
-  // 8. Sign Evidence
+  // 7. Sign Evidence
   const handleSignEvidence = (id: string, signerName: string) => {
     setEvidenceItems((prev) =>
       prev.map((e) =>
@@ -481,7 +385,7 @@ export default function App() {
     showToast('SUCCESS', 'DIGITALLY SIGNED', `ECDSA signature stamped by ${signerName}`);
   };
 
-  // 9. Revoke Active Session
+  // 8. Revoke Active Session
   const handleRevokeSession = (sessionId: string) => {
     setActiveSessions((prev) => prev.filter((s) => s.id !== sessionId));
     const now = new Date().toISOString().replace('T', ' ').slice(0, 19) + ' UTC';
@@ -501,8 +405,8 @@ export default function App() {
     showToast('SUCCESS', 'SESSION REVOKED', `Enclave bearer token revoked for session ${sessionId}`);
   };
 
-  // 10. Simulate Unauthorized Download (RBAC Enforcement)
-  const handleSimulateUnauthorizedDownload = (evidence: EvidenceItem) => {
+  // 9. Download Evidence (RBAC Enforcement)
+  const handleDownloadEvidence = (evidence: EvidenceItem) => {
     if (evidence.classification === 'TOP SECRET' && officer.clearanceLevel < 4) {
       const now = new Date().toISOString().replace('T', ' ').slice(0, 19) + ' UTC';
       const newAudit: AuditEvent = {
@@ -575,9 +479,8 @@ export default function App() {
   }
 
   return (
-    <GlobalSpotlightProvider>
-      <div className="min-h-screen bg-[#f8fafc] text-slate-900 font-sans selection:bg-slate-200 selection:text-slate-900">
-        {/* Left-Corner Minimal Sidebar with Forensics & Case Navigation */}
+    <div className="min-h-screen bg-[#f8fafc] text-slate-900 font-sans selection:bg-slate-200 selection:text-slate-900">
+      {/* Left-Corner Minimal Sidebar with Forensics & Case Navigation */}
       <Sidebar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
@@ -619,22 +522,6 @@ export default function App() {
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3">
-            {/* Quick SIH Demo Simulation Trigger */}
-            <button
-              onClick={() => {
-                const target = evidenceItems[0];
-                if (target) {
-                  if (!target.isTampered) handleSimulateTamper(target.id);
-                  else handleRestoreEvidence(target.id);
-                }
-              }}
-              title="Quick Toggle: Simulate Bitstream Tampering"
-              className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 text-[11px] font-medium transition-all cursor-pointer"
-            >
-              <Zap className="w-3.5 h-3.5 text-amber-600" />
-              <span>TAMPER TEST</span>
-            </button>
-
             {/* CLI Terminal Toggle */}
             <button
               onClick={() => setIsTerminalOpen(!isTerminalOpen)}
@@ -709,7 +596,6 @@ export default function App() {
                 setIntegritySelectedId(id);
                 setActiveTab('integrity');
               }}
-              onSimulateTamper={handleSimulateTamper}
               onToggleTerminal={() => setIsTerminalOpen(true)}
             />
           )}
@@ -732,9 +618,8 @@ export default function App() {
                 setNeuralSelectedId(id);
                 setActiveTab('neural');
               }}
-              onSimulateTamper={handleSimulateTamper}
               onRestoreEvidence={handleRestoreEvidence}
-              onSimulateUnauthorizedDownload={handleSimulateUnauthorizedDownload}
+              onDownloadEvidence={handleDownloadEvidence}
             />
           )}
 
@@ -743,7 +628,6 @@ export default function App() {
             <IntegrityEngineView
               evidenceItems={evidenceItems}
               onVerifyEvidence={handleVerifyEvidence}
-              onSimulateTamper={handleSimulateTamper}
               onRestoreEvidence={handleRestoreEvidence}
             />
           )}
@@ -764,7 +648,6 @@ export default function App() {
             <ThreatMonitorView
               threats={threats}
               onMitigateThreat={handleMitigateThreat}
-              onSimulateNewThreat={handleSimulateNewThreat}
             />
           )}
 
@@ -946,7 +829,6 @@ export default function App() {
         onClose={() => setIsTerminalOpen(false)}
         evidenceItems={evidenceItems}
         onVerifyEvidence={handleVerifyEvidence}
-        onSimulateTamper={handleSimulateTamper}
         onOpenIngestion={() => {
           setIsTerminalOpen(false);
           setIsIngestionOpen(true);
@@ -1003,7 +885,6 @@ export default function App() {
         officer={officer}
         onLockSystem={() => setIsLocked(true)}
       />
-      </div>
-    </GlobalSpotlightProvider>
+    </div>
   );
 }

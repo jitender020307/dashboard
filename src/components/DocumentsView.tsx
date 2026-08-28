@@ -5,8 +5,7 @@ import {
   Eye,
   EyeOff,
   Download,
-  ExternalLink,
-  Lock
+  ExternalLink
 } from 'lucide-react';
 import { CaseItem, CaseDocument } from '../types';
 

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import {
   AlertTriangle,
-  AlertOctagon,
   RefreshCw,
   Fingerprint,
   Zap,
@@ -9,7 +8,6 @@ import {
   CheckCircle2,
   Lock,
   Search,
-  Activity,
   ShieldCheck,
   Info,
   Check,
@@ -20,14 +18,12 @@ import { EvidenceItem } from '../types';
 interface IntegrityEngineProps {
   evidenceItems: EvidenceItem[];
   onVerifyEvidence: (id: string) => void;
-  onSimulateTamper: (id: string) => void;
   onRestoreEvidence: (id: string) => void;
 }
 
 export const IntegrityEngineView: React.FC<IntegrityEngineProps> = ({
   evidenceItems,
   onVerifyEvidence,
-  onSimulateTamper,
   onRestoreEvidence,
 }) => {
   const [selectedEvidenceId, setSelectedEvidenceId] = useState<string>(
@@ -85,13 +81,9 @@ export const IntegrityEngineView: React.FC<IntegrityEngineProps> = ({
           </p>
         </div>
 
-        {/* Demo Mode Badge */}
-        <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 p-2.5 rounded-xl">
-          <Zap className="w-4 h-4 text-amber-600 shrink-0" />
-          <div className="text-xs">
-            <div className="text-slate-800 font-bold text-[11px]">Interactive Tamper Test</div>
-            <div className="text-[11px] text-slate-500">Simulate file modifications to test detection</div>
-          </div>
+        <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-xs text-slate-600 font-mono">
+          <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+          <span>ALGORITHM: SHA-256</span>
         </div>
       </div>
 
@@ -129,29 +121,20 @@ export const IntegrityEngineView: React.FC<IntegrityEngineProps> = ({
           <button
             onClick={handleRunVerification}
             disabled={isVerifying}
-            className="interactive-glow px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs flex items-center gap-1.5 transition-all shadow-xs cursor-pointer disabled:opacity-50"
+            className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs flex items-center gap-1.5 transition-all shadow-xs cursor-pointer disabled:opacity-50"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${isVerifying ? 'animate-spin' : ''}`} />
             <span>{isVerifying ? 'Calculating Fingerprint...' : 'Run Verification Check'}</span>
           </button>
 
-          {!isMismatch ? (
-            <button
-              onClick={() => selectedEvidence && onSimulateTamper(selectedEvidence.id)}
-              title="Test: Simulate unauthorized file modification"
-              className="interactive-glow px-3 py-2 rounded-xl bg-white hover:bg-rose-50 text-rose-700 border border-rose-200 text-xs font-medium flex items-center gap-1 transition-colors cursor-pointer shadow-2xs"
-            >
-              <Zap className="w-3.5 h-3.5 text-amber-600" />
-              <span>Simulate Tamper</span>
-            </button>
-          ) : (
+          {isMismatch && (
             <button
               onClick={() => selectedEvidence && onRestoreEvidence(selectedEvidence.id)}
               title="Restore original authentic file version"
-              className="interactive-glow px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold flex items-center gap-1 transition-colors cursor-pointer shadow-xs"
+              className="px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold flex items-center gap-1 transition-colors cursor-pointer shadow-xs"
             >
               <RotateCcw className="w-3.5 h-3.5" />
-              <span>Restore Original</span>
+              <span>Restore Verified Baseline</span>
             </button>
           )}
         </div>
@@ -296,9 +279,9 @@ export const IntegrityEngineView: React.FC<IntegrityEngineProps> = ({
             </div>
 
             <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-600">
-              <div className="font-semibold text-slate-800 mb-1">Quick Action:</div>
+              <div className="font-semibold text-slate-800 mb-1">Cryptographic Audit:</div>
               <p className="text-[11px] text-slate-500">
-                Click &quot;Simulate Tamper&quot; above to see how the system detects unauthorized modifications.
+                Verification checks automatically query the immutable evidence ledger and record an audit log with timestamp and examiner credentials.
               </p>
             </div>
           </div>

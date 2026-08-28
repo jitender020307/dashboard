@@ -1,7 +1,6 @@
 import React from 'react';
-import { Shield, FileText, Package, ArrowRight, Lock, Clock } from 'lucide-react';
+import { FileText, Package, ArrowRight } from 'lucide-react';
 import { CaseItem } from '../types';
-import { SpotlightBox } from './InteractiveSpotlight';
 
 interface CaseCardProps {
   caseData: CaseItem;
@@ -12,7 +11,7 @@ export const CaseCard: React.FC<CaseCardProps> = ({ caseData, onOpenCase }) => {
   const isTopSecret = caseData.classification === 'TOP SECRET';
 
   return (
-    <SpotlightBox
+    <div
       onClick={() => onOpenCase(caseData)}
       className="rounded-lg bg-white border border-zinc-200 hover:border-sky-300 transition-all duration-150 flex flex-col justify-between p-5 cursor-pointer group shadow-2xs hover:shadow-md"
     >
@@ -101,6 +100,6 @@ export const CaseCard: React.FC<CaseCardProps> = ({ caseData, onOpenCase }) => {
           <ArrowRight className="w-3 h-3" />
         </span>
       </div>
-    </SpotlightBox>
+    </div>
   );
 };

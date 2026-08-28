@@ -23,7 +23,6 @@ export const SignatureVerificationView: React.FC<SignatureVerificationViewProps>
     evidenceItems[0]?.id || 'EV-2026-00421'
   );
   const [isSigning, setIsSigning] = useState(false);
-  const [simulatedInvalid, setSimulatedInvalid] = useState(false);
 
   const selectedEvidence =
     evidenceItems.find((e) => e.id === selectedId) || evidenceItems[0];
@@ -38,7 +37,7 @@ export const SignatureVerificationView: React.FC<SignatureVerificationViewProps>
     }, 600);
   };
 
-  const isSigValid = !simulatedInvalid && selectedEvidence?.signatureStatus === 'VALID';
+  const isSigValid = selectedEvidence?.signatureStatus === 'VALID';
 
   return (
     <div className="space-y-6 font-technical text-slate-900">
@@ -47,7 +46,7 @@ export const SignatureVerificationView: React.FC<SignatureVerificationViewProps>
         <div>
           <div className="flex items-center gap-2">
             <span className="px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-slate-700 text-[10px] font-bold tracking-wider uppercase">
-              MODULE 11 // DIGITAL SIGNATURE VERIFICATION
+              PKI Cryptographic Verification
             </span>
             <span className="px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-emerald-700 text-[10px] font-semibold">
               ● PKI AUTHORITY ONLINE
@@ -61,16 +60,9 @@ export const SignatureVerificationView: React.FC<SignatureVerificationViewProps>
           </p>
         </div>
 
-        <button
-          onClick={() => setSimulatedInvalid(!simulatedInvalid)}
-          className={`px-3.5 py-2 rounded-lg text-xs font-semibold transition-all border shrink-0 cursor-pointer ${
-            simulatedInvalid
-              ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
-              : 'bg-white hover:bg-rose-50 text-rose-700 border-rose-200 shadow-2xs'
-          }`}
-        >
-          {simulatedInvalid ? 'RESTORE STATUS' : 'SIMULATE INVALID SIGNATURE'}
-        </button>
+        <div className="flex items-center gap-2 px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-mono text-slate-600">
+          <span>ALGORITHM: ECDSA P-384</span>
+        </div>
       </div>
 
       {/* Target Evidence Selector Bar */}

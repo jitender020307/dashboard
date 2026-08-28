@@ -7,7 +7,6 @@ interface HackerTerminalProps {
   onClose: () => void;
   evidenceItems: EvidenceItem[];
   onVerifyEvidence: (id: string) => void;
-  onSimulateTamper: (id: string) => void;
   onOpenIngestion?: () => void;
   auditEvents?: AuditEvent[];
 }
@@ -17,7 +16,6 @@ export const HackerTerminal: React.FC<HackerTerminalProps> = ({
   onClose,
   evidenceItems = [],
   onVerifyEvidence,
-  onSimulateTamper,
   onOpenIngestion,
   auditEvents = [],
 }) => {
@@ -60,7 +58,7 @@ export const HackerTerminal: React.FC<HackerTerminalProps> = ({
           { type: 'output', text: '  status           : Show cryptographic core and node health' },
           { type: 'output', text: '  list-evidence    : Display all registered digital evidence artifacts' },
           { type: 'output', text: '  verify <ev_id>   : Execute SHA-256 bitstream integrity verification' },
-          { type: 'output', text: '  tamper <ev_id>   : DEMO: Simulate bit-flip payload tampering' },
+          { type: 'output', text: '  inspect <ev_id>  : View artifact hash, custodian, and security metadata' },
           { type: 'output', text: '  ingest           : Launch 9-step Forensic Artifact Ingestion wizard' },
           { type: 'output', text: '  audit            : Display latest security audit event records' },
           { type: 'output', text: '  whoami           : Print active officer cryptographic credentials' },
@@ -131,20 +129,22 @@ export const HackerTerminal: React.FC<HackerTerminalProps> = ({
         }
         break;
 
-      case 'tamper':
+      case 'inspect':
         if (!arg) {
-          newHistory.push({ type: 'warning', text: 'Usage: tamper <ev_id>  (e.g., tamper EV-2026-00421)' });
+          newHistory.push({ type: 'warning', text: 'Usage: inspect <ev_id>  (e.g., inspect EV-2026-00421)' });
         } else {
           const target = evidenceItems.find(
             (e) => e.id.toLowerCase() === arg.toLowerCase() || e.id.toLowerCase().includes(arg.toLowerCase())
           );
           if (target) {
             newHistory.push(
-              { type: 'warning', text: `[DEMO MODE] Injecting bit-flip payload into ${target.id}...` },
-              { type: 'error', text: '⚠ MODIFIED HASH: C4CA4238A0B923820DCC509A6F75849B29E0186716035129994C6F3764D85202' },
-              { type: 'error', text: '⚠ CRITICAL: DOCUMENT INTEGRITY FAILURE LOGGED TO AUDIT TRAIL' }
+              { type: 'output', text: `ARTIFACT DOSSIER: ${target.name} [${target.id}]` },
+              { type: 'output', text: `  Case ID         : ${target.caseId}` },
+              { type: 'output', text: `  Classification  : ${target.classification}` },
+              { type: 'output', text: `  Current Custody : ${target.currentCustodian}` },
+              { type: 'output', text: `  Signature       : ${target.signatureStatus} (${target.signerName || 'None'})` },
+              { type: 'output', text: `  SHA-256 Hash    : ${target.digitalHashSha256}` }
             );
-            onSimulateTamper(target.id);
           } else {
             newHistory.push({ type: 'error', text: `Error: Evidence item "${arg}" not found.` });
           }

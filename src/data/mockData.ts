@@ -1,4 +1,4 @@
-import { CaseItem, SecurityAlert, OfficerProfile, CaseDocument } from '../types';
+import { CaseItem, SecurityAlert, OfficerProfile } from '../types';
 
 export const CURRENT_OFFICER: OfficerProfile = {
   id: 'IO-1042',
